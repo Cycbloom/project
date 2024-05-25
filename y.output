@@ -1,0 +1,183 @@
+Terminals unused in grammar
+
+    ARRAY
+    BREAK
+    DO
+    ELSE
+    END
+    FOR
+    FUNCTION
+    IF
+    IN
+    LET
+    NIL
+    OF
+    THEN
+    TO
+    TYPE
+    VAR
+    WHILE
+    COMMA
+    COLON
+    LPAREN
+    RPAREN
+    LBRACKET
+    RBRACKET
+    LBRACE
+    RBRACE
+    DOT
+    MINUS
+    MULTIPLY
+    DIVIDE
+    EQUAL
+    NOT_EQUAL
+    LESS_THAN
+    LESS_THAN_OR_EQUAL
+    GREATER_THAN
+    GREATER_THAN_OR_EQUAL
+    AND
+    OR
+    ASSIGN
+    STRING_CONSTANT
+    INVALID_TOKEN
+    END_OF_FILE
+    INTEGER_CONSTANT
+
+
+Grammar
+
+    0 $accept: prog $end
+
+    1 prog: IDENTIFIER SEMICOLON subprog
+
+    2 subprog: IDENTIFIER PLUS IDENTIFIER
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    ARRAY (258)
+    BREAK (259)
+    DO (260)
+    ELSE (261)
+    END (262)
+    FOR (263)
+    FUNCTION (264)
+    IF (265)
+    IN (266)
+    LET (267)
+    NIL (268)
+    OF (269)
+    THEN (270)
+    TO (271)
+    TYPE (272)
+    VAR (273)
+    WHILE (274)
+    COMMA (275)
+    COLON (276)
+    SEMICOLON (277) 1
+    LPAREN (278)
+    RPAREN (279)
+    LBRACKET (280)
+    RBRACKET (281)
+    LBRACE (282)
+    RBRACE (283)
+    DOT (284)
+    PLUS (285) 2
+    MINUS (286)
+    MULTIPLY (287)
+    DIVIDE (288)
+    EQUAL (289)
+    NOT_EQUAL (290)
+    LESS_THAN (291)
+    LESS_THAN_OR_EQUAL (292)
+    GREATER_THAN (293)
+    GREATER_THAN_OR_EQUAL (294)
+    AND (295)
+    OR (296)
+    ASSIGN (297)
+    STRING_CONSTANT (298)
+    INVALID_TOKEN (299)
+    END_OF_FILE (300)
+    IDENTIFIER <id> (301) 1 2
+    INTEGER_CONSTANT <i> (302)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (48)
+        on left: 0
+    prog (49)
+        on left: 1
+        on right: 0
+    subprog (50)
+        on left: 2
+        on right: 1
+
+
+State 0
+
+    0 $accept: . prog $end
+
+    IDENTIFIER  shift, and go to state 1
+
+    prog  go to state 2
+
+
+State 1
+
+    1 prog: IDENTIFIER . SEMICOLON subprog
+
+    SEMICOLON  shift, and go to state 3
+
+
+State 2
+
+    0 $accept: prog . $end
+
+    $end  shift, and go to state 4
+
+
+State 3
+
+    1 prog: IDENTIFIER SEMICOLON . subprog
+
+    IDENTIFIER  shift, and go to state 5
+
+    subprog  go to state 6
+
+
+State 4
+
+    0 $accept: prog $end .
+
+    $default  accept
+
+
+State 5
+
+    2 subprog: IDENTIFIER . PLUS IDENTIFIER
+
+    PLUS  shift, and go to state 7
+
+
+State 6
+
+    1 prog: IDENTIFIER SEMICOLON subprog .
+
+    $default  reduce using rule 1 (prog)
+
+
+State 7
+
+    2 subprog: IDENTIFIER PLUS . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 8
+
+
+State 8
+
+    2 subprog: IDENTIFIER PLUS IDENTIFIER .
+
+    $default  reduce using rule 2 (subprog)
