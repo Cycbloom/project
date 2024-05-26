@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+#ifndef YY_YY_TIGER_H_INCLUDED
+# define YY_YY_TIGER_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -104,58 +104,6 @@ extern int yydebug;
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define ARRAY 258
-#define BREAK 259
-#define DO 260
-#define ELSE 261
-#define END 262
-#define FOR 263
-#define FUNCTION 264
-#define IF 265
-#define IN 266
-#define LET 267
-#define NIL 268
-#define OF 269
-#define THEN 270
-#define TO 271
-#define TYPE 272
-#define VAR 273
-#define WHILE 274
-#define COMMA 275
-#define COLON 276
-#define SEMICOLON 277
-#define LPAREN 278
-#define RPAREN 279
-#define LBRACKET 280
-#define RBRACKET 281
-#define LBRACE 282
-#define RBRACE 283
-#define DOT 284
-#define PLUS 285
-#define MINUS 286
-#define MULTIPLY 287
-#define DIVIDE 288
-#define EQUAL 289
-#define NOT_EQUAL 290
-#define LESS_THAN 291
-#define LESS_THAN_OR_EQUAL 292
-#define GREATER_THAN 293
-#define GREATER_THAN_OR_EQUAL 294
-#define AND 295
-#define OR 296
-#define ASSIGN 297
-#define STRING_CONSTANT 298
-#define INVALID_TOKEN 299
-#define END_OF_FILE 300
-#define UNARY_MINUS 301
-#define ID 302
-#define INTEGER_CONSTANT 303
-#define LOWER_THAN_ELSE 304
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -166,7 +114,7 @@ union YYSTYPE
 	int i;
 	char* id;
 
-#line 170 "y.tab.h"
+#line 118 "tiger.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -181,4 +129,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_TIGER_H_INCLUDED  */

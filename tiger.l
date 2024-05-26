@@ -57,7 +57,7 @@ int comment_count = 0;/* 定义计数器 */
 "&"                { return AND; }
 "|"                { return OR; }
 ":="               { return ASSIGN; }
-[a-zA-Z][a-zA-Z0-9_]* { return IDENTIFIER; }
+[a-zA-Z][a-zA-Z0-9_]* { return ID; }
 [0-9]+             { return INTEGER_CONSTANT; }
 \"([^\\\"]|\\.)*\" { return STRING_CONSTANT; }
 \n                 { /* 忽略换行符 */ }

@@ -74,7 +74,7 @@
 	int yylex(void);
 	void yyerror(char* s);      
 
-#line 78 "y.tab.c"
+#line 78 "tiger.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -97,152 +97,7 @@
 #  endif
 # endif
 
-
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token kinds.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    ARRAY = 258,                   /* ARRAY  */
-    BREAK = 259,                   /* BREAK  */
-    DO = 260,                      /* DO  */
-    ELSE = 261,                    /* ELSE  */
-    END = 262,                     /* END  */
-    FOR = 263,                     /* FOR  */
-    FUNCTION = 264,                /* FUNCTION  */
-    IF = 265,                      /* IF  */
-    IN = 266,                      /* IN  */
-    LET = 267,                     /* LET  */
-    NIL = 268,                     /* NIL  */
-    OF = 269,                      /* OF  */
-    THEN = 270,                    /* THEN  */
-    TO = 271,                      /* TO  */
-    TYPE = 272,                    /* TYPE  */
-    VAR = 273,                     /* VAR  */
-    WHILE = 274,                   /* WHILE  */
-    COMMA = 275,                   /* COMMA  */
-    COLON = 276,                   /* COLON  */
-    SEMICOLON = 277,               /* SEMICOLON  */
-    LPAREN = 278,                  /* LPAREN  */
-    RPAREN = 279,                  /* RPAREN  */
-    LBRACKET = 280,                /* LBRACKET  */
-    RBRACKET = 281,                /* RBRACKET  */
-    LBRACE = 282,                  /* LBRACE  */
-    RBRACE = 283,                  /* RBRACE  */
-    DOT = 284,                     /* DOT  */
-    PLUS = 285,                    /* PLUS  */
-    MINUS = 286,                   /* MINUS  */
-    MULTIPLY = 287,                /* MULTIPLY  */
-    DIVIDE = 288,                  /* DIVIDE  */
-    EQUAL = 289,                   /* EQUAL  */
-    NOT_EQUAL = 290,               /* NOT_EQUAL  */
-    LESS_THAN = 291,               /* LESS_THAN  */
-    LESS_THAN_OR_EQUAL = 292,      /* LESS_THAN_OR_EQUAL  */
-    GREATER_THAN = 293,            /* GREATER_THAN  */
-    GREATER_THAN_OR_EQUAL = 294,   /* GREATER_THAN_OR_EQUAL  */
-    AND = 295,                     /* AND  */
-    OR = 296,                      /* OR  */
-    ASSIGN = 297,                  /* ASSIGN  */
-    STRING_CONSTANT = 298,         /* STRING_CONSTANT  */
-    INVALID_TOKEN = 299,           /* INVALID_TOKEN  */
-    END_OF_FILE = 300,             /* END_OF_FILE  */
-    UNARY_MINUS = 301,             /* UNARY_MINUS  */
-    ID = 302,                      /* ID  */
-    INTEGER_CONSTANT = 303,        /* INTEGER_CONSTANT  */
-    LOWER_THAN_ELSE = 304          /* LOWER_THAN_ELSE  */
-  };
-  typedef enum yytokentype yytoken_kind_t;
-#endif
-/* Token kinds.  */
-#define YYEMPTY -2
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define ARRAY 258
-#define BREAK 259
-#define DO 260
-#define ELSE 261
-#define END 262
-#define FOR 263
-#define FUNCTION 264
-#define IF 265
-#define IN 266
-#define LET 267
-#define NIL 268
-#define OF 269
-#define THEN 270
-#define TO 271
-#define TYPE 272
-#define VAR 273
-#define WHILE 274
-#define COMMA 275
-#define COLON 276
-#define SEMICOLON 277
-#define LPAREN 278
-#define RPAREN 279
-#define LBRACKET 280
-#define RBRACKET 281
-#define LBRACE 282
-#define RBRACE 283
-#define DOT 284
-#define PLUS 285
-#define MINUS 286
-#define MULTIPLY 287
-#define DIVIDE 288
-#define EQUAL 289
-#define NOT_EQUAL 290
-#define LESS_THAN 291
-#define LESS_THAN_OR_EQUAL 292
-#define GREATER_THAN 293
-#define GREATER_THAN_OR_EQUAL 294
-#define AND 295
-#define OR 296
-#define ASSIGN 297
-#define STRING_CONSTANT 298
-#define INVALID_TOKEN 299
-#define END_OF_FILE 300
-#define UNARY_MINUS 301
-#define ID 302
-#define INTEGER_CONSTANT 303
-#define LOWER_THAN_ELSE 304
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
-#line 8 "tiger.y"
-
-	int i;
-	char* id;
-
-#line 231 "y.tab.c"
-
-};
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
-extern YYSTYPE yylval;
-
-
-int yyparse (void);
-
-
-
+#include "tiger.h"
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -767,7 +622,7 @@ static const yytype_int16 yypact[] =
 {
       -3,   -36,   -35,    -3,     5,   -36,    -3,    -3,    -3,   -36,
       16,   -36,    21,   153,   -10,   -18,    59,   -20,   -14,    -9,
-      64,   -36,   -36,   -36,   -36,    29,   153,     7,    18,   -23,
+      64,   -36,   -36,   -36,   -36,    29,   153,     7,    18,   153,
       -3,    -3,     1,   -36,   -36,   -36,   -36,   -36,   -36,   -36,
      -36,   -36,   -36,   -36,   -36,   -36,    -3,    -3,     6,    -3,
       -3,    -3,    31,    22,   -17,    -3,   -36,    -3,    -3,   -36,
@@ -1371,11 +1226,11 @@ yyreduce:
   case 2: /* prog: expr  */
 #line 32 "tiger.y"
                 {printf("语法分析成功！\n");}
-#line 1375 "y.tab.c"
+#line 1230 "tiger.c"
     break;
 
 
-#line 1379 "y.tab.c"
+#line 1234 "tiger.c"
 
       default: break;
     }

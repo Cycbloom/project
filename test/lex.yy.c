@@ -510,13 +510,13 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "tiger.l"
-#line 2 "tiger.l"
+#line 1 "test.l"
+#line 2 "test.l"
 #include <stdio.h>
-#include"y.tab.h"
 void yyerror(char *);
+/* 定义计数器 */
+int comment_count = 0;
 
-int comment_count = 0;/* 定义计数器 */
 #line 521 "lex.yy.c"
 /* 定义状态 */
 
@@ -738,7 +738,7 @@ YY_DECL
 		}
 
 	{
-#line 14 "tiger.l"
+#line 15 "test.l"
 
 
 #line 745 "lex.yy.c"
@@ -800,259 +800,259 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 16 "tiger.l"
+#line 17 "test.l"
 { if(comment_count == 0) BEGIN(COMMENT); comment_count++; /* 进入注释模式并增加计数器 */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 17 "tiger.l"
+#line 18 "test.l"
 { comment_count++; /* 增加嵌套注释的计数器 */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 18 "tiger.l"
+#line 19 "test.l"
 { comment_count--; /* 减少计数器 */ if(comment_count == 0) BEGIN(INITIAL); /* 如果计数器为0，则退出注释模式 */ }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 19 "tiger.l"
+#line 20 "test.l"
 { /* 在注释模式下，忽略所有字符 */ }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 20 "tiger.l"
-{ return ARRAY; }
+#line 21 "test.l"
+{ printf("ARRAY\n"); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 21 "tiger.l"
-{ return BREAK; }
+#line 22 "test.l"
+{ printf("BREAK\n"); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 22 "tiger.l"
-{ return DO; }
+#line 23 "test.l"
+{ printf("DO\n"); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 23 "tiger.l"
-{ return ELSE; }
+#line 24 "test.l"
+{ printf("ELSE\n"); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 24 "tiger.l"
-{ return END; }
+#line 25 "test.l"
+{ printf("END\n"); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 25 "tiger.l"
-{ return FOR; }
+#line 26 "test.l"
+{ printf("FOR\n"); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 26 "tiger.l"
-{ return FUNCTION; }
+#line 27 "test.l"
+{ printf("FUNCTION\n"); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 27 "tiger.l"
-{ return IF; }
+#line 28 "test.l"
+{ printf("IF\n"); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 28 "tiger.l"
-{ return IN; }
+#line 29 "test.l"
+{ printf("IN\n"); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 29 "tiger.l"
-{ return LET; }
+#line 30 "test.l"
+{ printf("LET\n"); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 30 "tiger.l"
-{ return NIL; }
+#line 31 "test.l"
+{ printf("NIL\n"); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 31 "tiger.l"
-{ return OF; }
+#line 32 "test.l"
+{ printf("OF\n"); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 32 "tiger.l"
-{ return THEN; }
+#line 33 "test.l"
+{ printf("THEN\n"); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 33 "tiger.l"
-{ return TO; }
+#line 34 "test.l"
+{ printf("TO\n"); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 34 "tiger.l"
-{ return TYPE; }
+#line 35 "test.l"
+{ printf("TYPE\n"); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 35 "tiger.l"
-{ return VAR; }
+#line 36 "test.l"
+{ printf("VAR\n"); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 36 "tiger.l"
-{ return WHILE; }
+#line 37 "test.l"
+{ printf("WHILE\n"); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 37 "tiger.l"
-{ return COMMA; }
+#line 38 "test.l"
+{ printf("COMMA\n"); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 38 "tiger.l"
-{ return COLON; }
+#line 39 "test.l"
+{ printf("COLON\n"); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 39 "tiger.l"
-{ return SEMICOLON; }
+#line 40 "test.l"
+{ printf("SEMICOLON\n"); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 40 "tiger.l"
-{ return LPAREN; }
+#line 41 "test.l"
+{ printf("LPAREN\n"); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 41 "tiger.l"
-{ return RPAREN; }
+#line 42 "test.l"
+{ printf("RPAREN\n"); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 42 "tiger.l"
-{ return LBRACKET; }
+#line 43 "test.l"
+{ printf("LBRACKET\n"); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 43 "tiger.l"
-{ return RBRACKET; }
+#line 44 "test.l"
+{ printf("RBRACKET\n"); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 44 "tiger.l"
-{ return LBRACE; }
+#line 45 "test.l"
+{ printf("LBRACE\n"); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 45 "tiger.l"
-{ return RBRACE; }
+#line 46 "test.l"
+{ printf("RBRACE\n"); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 46 "tiger.l"
-{ return DOT; }
+#line 47 "test.l"
+{ printf("DOT\n"); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 47 "tiger.l"
-{ return PLUS; }
+#line 48 "test.l"
+{ printf("PLUS\n"); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 48 "tiger.l"
-{ return MINUS; }
+#line 49 "test.l"
+{ printf("MINUS\n"); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 49 "tiger.l"
-{ return MULTIPLY; }
+#line 50 "test.l"
+{ printf("MULTIPLY\n"); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 50 "tiger.l"
-{ return DIVIDE; }
+#line 51 "test.l"
+{ printf("DIVIDE\n"); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 51 "tiger.l"
-{ return EQUAL; }
+#line 52 "test.l"
+{ printf("EQUAL\n"); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 52 "tiger.l"
-{ return NOT_EQUAL; }
+#line 53 "test.l"
+{ printf("NOT_EQUAL\n"); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 53 "tiger.l"
-{ return LESS_THAN; }
+#line 54 "test.l"
+{ printf("LESS_THAN\n"); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 54 "tiger.l"
-{ return LESS_THAN_OR_EQUAL; }
+#line 55 "test.l"
+{ printf("LESS_THAN_OR_EQUAL\n"); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 55 "tiger.l"
-{ return GREATER_THAN; }
+#line 56 "test.l"
+{ printf("GREATER_THAN\n"); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 56 "tiger.l"
-{ return GREATER_THAN_OR_EQUAL; }
+#line 57 "test.l"
+{ printf("GREATER_THAN_OR_EQUAL\n"); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 57 "tiger.l"
-{ return AND; }
+#line 58 "test.l"
+{ printf("AND\n"); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 58 "tiger.l"
-{ return OR; }
+#line 59 "test.l"
+{ printf("OR\n"); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 59 "tiger.l"
-{ return ASSIGN; }
+#line 60 "test.l"
+{ printf("ASSIGN\n"); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 60 "tiger.l"
-{ return ID; }
+#line 61 "test.l"
+{ printf("IDENTIFIER\n"); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 61 "tiger.l"
-{ return INTEGER_CONSTANT; }
+#line 62 "test.l"
+{ printf("INTEGER_CONSTANT\n"); }
 	YY_BREAK
 case 47:
 /* rule 47 can match eol */
 YY_RULE_SETUP
-#line 62 "tiger.l"
-{ return STRING_CONSTANT; }
+#line 63 "test.l"
+{ printf("STRING_CONSTANT\n"); }
 	YY_BREAK
 case 48:
 /* rule 48 can match eol */
 YY_RULE_SETUP
-#line 63 "tiger.l"
+#line 64 "test.l"
 { /* 忽略换行符 */ }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 64 "tiger.l"
+#line 65 "test.l"
 { /* 忽略空白符 */ }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 65 "tiger.l"
+#line 66 "test.l"
 { /* 匹配其他字符，但不做任何操作 */ }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 67 "tiger.l"
+#line 68 "test.l"
 ECHO;
 	YY_BREAK
 #line 1059 "lex.yy.c"
@@ -2061,6 +2061,11 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 67 "tiger.l"
+#line 68 "test.l"
 
+
+int main() {
+    yylex();
+    return 0;
+}
 
