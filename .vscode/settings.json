@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "compare": "c",
+        "limits": "c",
+        "new": "c",
+        "ast.h": "c"
+    }
+}

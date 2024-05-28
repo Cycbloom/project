@@ -94,12 +94,12 @@ extern int yydebug;
     AND = 295,                     /* AND  */
     OR = 296,                      /* OR  */
     ASSIGN = 297,                  /* ASSIGN  */
-    STRING_CONSTANT = 298,         /* STRING_CONSTANT  */
-    INVALID_TOKEN = 299,           /* INVALID_TOKEN  */
-    END_OF_FILE = 300,             /* END_OF_FILE  */
-    UNARY_MINUS = 301,             /* UNARY_MINUS  */
-    ID = 302,                      /* ID  */
-    INTEGER_CONSTANT = 303,        /* INTEGER_CONSTANT  */
+    INVALID_TOKEN = 298,           /* INVALID_TOKEN  */
+    END_OF_FILE = 299,             /* END_OF_FILE  */
+    UNARY_MINUS = 300,             /* UNARY_MINUS  */
+    ID = 301,                      /* ID  */
+    INTEGER_CONSTANT = 302,        /* INTEGER_CONSTANT  */
+    STRING_CONSTANT = 303,         /* STRING_CONSTANT  */
     LOWER_THAN_ELSE = 304          /* LOWER_THAN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
@@ -149,24 +149,29 @@ extern int yydebug;
 #define AND 295
 #define OR 296
 #define ASSIGN 297
-#define STRING_CONSTANT 298
-#define INVALID_TOKEN 299
-#define END_OF_FILE 300
-#define UNARY_MINUS 301
-#define ID 302
-#define INTEGER_CONSTANT 303
+#define INVALID_TOKEN 298
+#define END_OF_FILE 299
+#define UNARY_MINUS 300
+#define ID 301
+#define INTEGER_CONSTANT 302
+#define STRING_CONSTANT 303
 #define LOWER_THAN_ELSE 304
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 8 "tiger.y"
+#line 18 "tiger.y"
 
-	int i;
+    char* sval;
+    int ival;
+
 	char* id;
+    tree_node node;
+    tree_node_list node_list;
+    enum relop reOp;
 
-#line 170 "y.tab.h"
+#line 175 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

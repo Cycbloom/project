@@ -1,11 +1,6 @@
 Terminals unused in grammar
 
     BREAK
-    FUNCTION
-    NIL
-    VAR
-    SEMICOLON
-    STRING_CONSTANT
     INVALID_TOKEN
     END_OF_FILE
     UNARY_MINUS
@@ -17,125 +12,176 @@ Grammar
 
     1 prog: stm
 
-    2 stm: assignStm
-    3    | conditionStm
-    4    | whileStm
-    5    | forStm
-    6    | letStm
-    7    | algorithmExp
+    2 stmBlock_opt: stmBlock
+    3             | ε
 
-    8 assignStm: lvalue ASSIGN algorithmExp
+    4 stmBlock: stm
+    5         | stmBlock SEMICOLON stm
 
-    9 conditionStm: IF relationExp THEN stm
-   10             | IF relationExp THEN stm ELSE stm
+    6 stm: assignStm
+    7    | conditionStm
+    8    | whileStm
+    9    | forStm
+   10    | letStm
+   11    | LPAREN stmBlock_opt RPAREN
+   12    | functionCallStm
 
-   11 whileStm: WHILE relationExp DO stm
+   13 assignStm: lvalue ASSIGN algorithmExp
+   14          | lvalue ASSIGN NIL
 
-   12 forStm: FOR ID ASSIGN algorithmExp TO algorithmExp DO stm
+   15 conditionStm: IF relationExp THEN stm
+   16             | IF relationExp THEN stm ELSE stm
 
-   13 letStm: LET declaration_list IN stm END
+   17 whileStm: WHILE relationExp DO stm
 
-   14 lvalue: ID
-   15       | lvalue DOT ID
-   16       | lvalue LBRACKET algorithmExp RBRACKET
+   18 forStm: FOR ID ASSIGN numberExp TO numberExp DO stm
 
-   17 relationExp: relationExpItem
-   18            | relationExp AND relationExpItem
-   19            | relationExp OR relationExpItem
+   19 letStm: LET declaration_list IN stm END
 
-   20 relationExpItem: algorithmExp relationOp algorithmExp
-   21                | algorithmExp
+   20 functionCallStm: ID LPAREN call_list_opt RPAREN
 
-   22 algorithmExp: item
-   23             | algorithmExp PLUS item
-   24             | algorithmExp MINUS item
+   21 call_list_opt: call_list
+   22              | ε
 
-   25 item: frator
-   26     | item MULTIPLY frator
-   27     | item DIVIDE frator
+   23 call_list: call_paramater
+   24          | call_list COMMA call_paramater
 
-   28 frator: ID
-   29       | INTEGER_CONSTANT
-   30       | LPAREN algorithmExp RPAREN
-   31       | MINUS frator
+   25 call_paramater: algorithmExp
+   26               | functionCallStm
 
-   32 relationOp: EQUAL
-   33           | NOT_EQUAL
-   34           | GREATER_THAN
-   35           | LESS_THAN
-   36           | GREATER_THAN_OR_EQUAL
-   37           | LESS_THAN_OR_EQUAL
+   27 lvalue: ID
+   28       | lvalue DOT ID
+   29       | lvalue LBRACKET numberExp RBRACKET
 
-   38 declaration_list: declaration
-   39                 | declaration_list declaration
+   30 relationExp: relationExpOR
 
-   40 declaration: type_declaration
+   31 relationExpOR: relationExpAND
+   32              | relationExpOR OR relationExpAND
 
-   41 type_declaration: TYPE ID EQUAL type
+   33 relationExpAND: relationExpItem
+   34               | relationExpAND AND relationExpItem
 
-   42 type: ID
-   43     | LBRACE type_fields_opt RBRACE
-   44     | ARRAY OF ID
+   35 relationExpItem: algorithmExp relationOp algorithmExp
+   36                | algorithmExp
+   37                | algorithmExp NOT_EQUAL NIL
+   38                | algorithmExp EQUAL NIL
 
-   45 type_fields_opt: type_fields
-   46                | ε
+   39 algorithmExp: numberExp
+   40             | stringExp
 
-   47 type_fields: type_field
-   48            | type_fields COMMA type_field
+   41 stringExp: STRING_CONSTANT
 
-   49 type_field: ID COLON ID
+   42 numberExp: numberItem
+   43          | numberExp PLUS numberItem
+   44          | numberExp MINUS numberItem
+
+   45 numberItem: numberFrator
+   46           | numberItem MULTIPLY numberFrator
+   47           | numberItem DIVIDE numberFrator
+
+   48 numberFrator: MINUS numberFrator
+   49             | ID
+   50             | INTEGER_CONSTANT
+   51             | LPAREN numberExp RPAREN
+
+   52 relationOp: EQUAL
+   53           | NOT_EQUAL
+   54           | GREATER_THAN
+   55           | LESS_THAN
+   56           | GREATER_THAN_OR_EQUAL
+   57           | LESS_THAN_OR_EQUAL
+
+   58 declaration_list: declaration
+   59                 | declaration_list declaration
+
+   60 declaration: type_declaration
+   61            | variable_declaration
+   62            | function_declaration
+
+   63 type_declaration: TYPE ID EQUAL type
+
+   64 type: ID
+   65     | LBRACE type_fields_opt RBRACE
+   66     | ARRAY OF ID
+
+   67 type_fields_opt: type_fields
+   68                | ε
+
+   69 type_fields: type_field
+   70            | type_fields COMMA type_field
+
+   71 type_field: ID COLON ID
+
+   72 variable_declaration: VAR ID ASSIGN assignRValue
+   73                     | VAR ID COLON ID ASSIGN assignRValue
+   74                     | VAR ID COLON ID ASSIGN NIL
+
+   75 assignRValue: algorithmExp
+   76             | ID LBRACKET numberExp RBRACKET OF numberExp
+   77             | ID LBRACE field_list_opt RBRACE
+
+   78 field_list_opt: field_list
+   79               | ε
+
+   80 field_list: field
+   81           | field_list COMMA field
+
+   82 field: ID EQUAL algorithmExp
+
+   83 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN EQUAL stm
+   84                     | FUNCTION ID LPAREN type_fields_opt RPAREN COLON ID EQUAL stm
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
-    ARRAY (258) 44
+    ARRAY (258) 66
     BREAK (259)
-    DO (260) 11 12
-    ELSE (261) 10
-    END (262) 13
-    FOR (263) 12
-    FUNCTION (264)
-    IF (265) 9 10
-    IN (266) 13
-    LET (267) 13
-    NIL (268)
-    OF (269) 44
-    THEN (270) 9 10
-    TO (271) 12
-    TYPE (272) 41
-    VAR (273)
-    WHILE (274) 11
-    COMMA (275) 48
-    COLON (276) 49
-    SEMICOLON (277)
-    LPAREN (278) 30
-    RPAREN (279) 30
-    LBRACKET (280) 16
-    RBRACKET (281) 16
-    LBRACE (282) 43
-    RBRACE (283) 43
-    DOT (284) 15
-    PLUS (285) 23
-    MINUS (286) 24 31
-    MULTIPLY (287) 26
-    DIVIDE (288) 27
-    EQUAL (289) 32 41
-    NOT_EQUAL (290) 33
-    LESS_THAN (291) 35
-    LESS_THAN_OR_EQUAL (292) 37
-    GREATER_THAN (293) 34
-    GREATER_THAN_OR_EQUAL (294) 36
-    AND (295) 18
-    OR (296) 19
-    ASSIGN (297) 8 12
-    STRING_CONSTANT (298)
-    INVALID_TOKEN (299)
-    END_OF_FILE (300)
-    UNARY_MINUS (301)
-    ID <id> (302) 12 14 15 28 41 42 44 49
-    INTEGER_CONSTANT <i> (303) 29
+    DO (260) 17 18
+    ELSE (261) 16
+    END (262) 19
+    FOR (263) 18
+    FUNCTION (264) 83 84
+    IF (265) 15 16
+    IN (266) 19
+    LET (267) 19
+    NIL (268) 14 37 38 74
+    OF (269) 66 76
+    THEN (270) 15 16
+    TO (271) 18
+    TYPE (272) 63
+    VAR (273) 72 73 74
+    WHILE (274) 17
+    COMMA (275) 24 70 81
+    COLON (276) 71 73 74 84
+    SEMICOLON (277) 5
+    LPAREN (278) 11 20 51 83 84
+    RPAREN (279) 11 20 51 83 84
+    LBRACKET (280) 29 76
+    RBRACKET (281) 29 76
+    LBRACE (282) 65 77
+    RBRACE (283) 65 77
+    DOT (284) 28
+    PLUS (285) 43
+    MINUS (286) 44 48
+    MULTIPLY (287) 46
+    DIVIDE (288) 47
+    EQUAL (289) 38 52 63 82 83 84
+    NOT_EQUAL (290) 37 53
+    LESS_THAN (291) 55
+    LESS_THAN_OR_EQUAL (292) 57
+    GREATER_THAN (293) 54
+    GREATER_THAN_OR_EQUAL (294) 56
+    AND (295) 34
+    OR (296) 32
+    ASSIGN (297) 13 14 18 72 73 74
+    INVALID_TOKEN (298)
+    END_OF_FILE (299)
+    UNARY_MINUS (300)
+    ID <id> (301) 18 20 27 28 49 63 64 66 71 72 73 74 76 77 82 83 84
+    INTEGER_CONSTANT <ival> (302) 50
+    STRING_CONSTANT <sval> (303) 41
     LOWER_THAN_ELSE (304)
 
 
@@ -146,1039 +192,1728 @@ Nonterminals, with rules where they appear
     prog (51)
         on left: 1
         on right: 0
-    stm (52)
-        on left: 2 3 4 5 6 7
-        on right: 1 9 10 11 12 13
-    assignStm (53)
-        on left: 8
-        on right: 2
-    conditionStm (54)
-        on left: 9 10
-        on right: 3
-    whileStm (55)
-        on left: 11
-        on right: 4
-    forStm (56)
-        on left: 12
-        on right: 5
-    letStm (57)
-        on left: 13
+    stmBlock_opt <node> (52)
+        on left: 2 3
+        on right: 11
+    stmBlock <node> (53)
+        on left: 4 5
+        on right: 2 5
+    stm <node> (54)
+        on left: 6 7 8 9 10 11 12
+        on right: 1 4 5 15 16 17 18 19 83 84
+    assignStm <node> (55)
+        on left: 13 14
         on right: 6
-    lvalue (58)
-        on left: 14 15 16
-        on right: 8 15 16
-    relationExp (59)
-        on left: 17 18 19
-        on right: 9 10 11 18 19
-    relationExpItem (60)
-        on left: 20 21
-        on right: 17 18 19
-    algorithmExp (61)
-        on left: 22 23 24
-        on right: 7 8 12 16 20 21 23 24 30
-    item (62)
-        on left: 25 26 27
-        on right: 22 23 24 26 27
-    frator (63)
-        on left: 28 29 30 31
-        on right: 25 26 27 31
-    relationOp (64)
-        on left: 32 33 34 35 36 37
+    conditionStm <node> (56)
+        on left: 15 16
+        on right: 7
+    whileStm <node> (57)
+        on left: 17
+        on right: 8
+    forStm <node> (58)
+        on left: 18
+        on right: 9
+    letStm <node> (59)
+        on left: 19
+        on right: 10
+    functionCallStm <node> (60)
+        on left: 20
+        on right: 12 26
+    call_list_opt <node_list> (61)
+        on left: 21 22
         on right: 20
-    declaration_list (65)
-        on left: 38 39
-        on right: 13 39
-    declaration (66)
-        on left: 40
-        on right: 38 39
-    type_declaration (67)
+    call_list <node_list> (62)
+        on left: 23 24
+        on right: 21 24
+    call_paramater <node> (63)
+        on left: 25 26
+        on right: 23 24
+    lvalue <node> (64)
+        on left: 27 28 29
+        on right: 13 14 28 29
+    relationExp <node> (65)
+        on left: 30
+        on right: 15 16 17
+    relationExpOR <node> (66)
+        on left: 31 32
+        on right: 30 32
+    relationExpAND <node> (67)
+        on left: 33 34
+        on right: 31 32 34
+    relationExpItem <node> (68)
+        on left: 35 36 37 38
+        on right: 33 34
+    algorithmExp <node> (69)
+        on left: 39 40
+        on right: 13 25 35 36 37 38 75 82
+    stringExp <node> (70)
         on left: 41
         on right: 40
-    type (68)
+    numberExp <node> (71)
         on left: 42 43 44
-        on right: 41
-    type_fields_opt (69)
-        on left: 45 46
-        on right: 43
-    type_fields (70)
-        on left: 47 48
-        on right: 45 48
-    type_field (71)
-        on left: 49
-        on right: 47 48
+        on right: 18 29 39 43 44 51 76
+    numberItem <node> (72)
+        on left: 45 46 47
+        on right: 42 43 44 46 47
+    numberFrator <node> (73)
+        on left: 48 49 50 51
+        on right: 45 46 47 48
+    relationOp <reOp> (74)
+        on left: 52 53 54 55 56 57
+        on right: 35
+    declaration_list (75)
+        on left: 58 59
+        on right: 19 59
+    declaration (76)
+        on left: 60 61 62
+        on right: 58 59
+    type_declaration (77)
+        on left: 63
+        on right: 60
+    type (78)
+        on left: 64 65 66
+        on right: 63
+    type_fields_opt (79)
+        on left: 67 68
+        on right: 65 83 84
+    type_fields (80)
+        on left: 69 70
+        on right: 67 70
+    type_field (81)
+        on left: 71
+        on right: 69 70
+    variable_declaration (82)
+        on left: 72 73 74
+        on right: 61
+    assignRValue (83)
+        on left: 75 76 77
+        on right: 72 73
+    field_list_opt (84)
+        on left: 78 79
+        on right: 77
+    field_list (85)
+        on left: 80 81
+        on right: 78 81
+    field (86)
+        on left: 82
+        on right: 80 81
+    function_declaration (87)
+        on left: 83 84
+        on right: 62
 
 
 State 0
 
     0 $accept: • prog $end
 
-    FOR               shift, and go to state 1
-    IF                shift, and go to state 2
-    LET               shift, and go to state 3
-    WHILE             shift, and go to state 4
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 7
-    INTEGER_CONSTANT  shift, and go to state 8
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
 
-    prog          go to state 9
-    stm           go to state 10
-    assignStm     go to state 11
-    conditionStm  go to state 12
-    whileStm      go to state 13
-    forStm        go to state 14
-    letStm        go to state 15
-    lvalue        go to state 16
-    algorithmExp  go to state 17
-    item          go to state 18
-    frator        go to state 19
+    prog             go to state 7
+    stm              go to state 8
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
 
 
 State 1
 
-   12 forStm: FOR • ID ASSIGN algorithmExp TO algorithmExp DO stm
+   18 forStm: FOR • ID ASSIGN numberExp TO numberExp DO stm
 
-    ID  shift, and go to state 20
+    ID  shift, and go to state 16
 
 
 State 2
 
-    9 conditionStm: IF • relationExp THEN stm
-   10             | IF • relationExp THEN stm ELSE stm
+   15 conditionStm: IF • relationExp THEN stm
+   16             | IF • relationExp THEN stm ELSE stm
 
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
 
     relationExp      go to state 22
-    relationExpItem  go to state 23
-    algorithmExp     go to state 24
-    item             go to state 18
-    frator           go to state 19
+    relationExpOR    go to state 23
+    relationExpAND   go to state 24
+    relationExpItem  go to state 25
+    algorithmExp     go to state 26
+    stringExp        go to state 27
+    numberExp        go to state 28
+    numberItem       go to state 29
+    numberFrator     go to state 30
 
 
 State 3
 
-   13 letStm: LET • declaration_list IN stm END
+   19 letStm: LET • declaration_list IN stm END
 
-    TYPE  shift, and go to state 25
+    FUNCTION  shift, and go to state 31
+    TYPE      shift, and go to state 32
+    VAR       shift, and go to state 33
 
-    declaration_list  go to state 26
-    declaration       go to state 27
-    type_declaration  go to state 28
+    declaration_list      go to state 34
+    declaration           go to state 35
+    type_declaration      go to state 36
+    variable_declaration  go to state 37
+    function_declaration  go to state 38
 
 
 State 4
 
-   11 whileStm: WHILE • relationExp DO stm
+   17 whileStm: WHILE • relationExp DO stm
 
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
 
-    relationExp      go to state 29
-    relationExpItem  go to state 23
-    algorithmExp     go to state 24
-    item             go to state 18
-    frator           go to state 19
+    relationExp      go to state 39
+    relationExpOR    go to state 23
+    relationExpAND   go to state 24
+    relationExpItem  go to state 25
+    algorithmExp     go to state 26
+    stringExp        go to state 27
+    numberExp        go to state 28
+    numberItem       go to state 29
+    numberFrator     go to state 30
 
 
 State 5
 
-   30 frator: LPAREN • algorithmExp RPAREN
+   11 stm: LPAREN • stmBlock_opt RPAREN
 
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
 
-    algorithmExp  go to state 30
-    item          go to state 18
-    frator        go to state 19
+    $default  reduce using rule 3 (stmBlock_opt)
+
+    stmBlock_opt     go to state 40
+    stmBlock         go to state 41
+    stm              go to state 42
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
 
 
 State 6
 
-   31 frator: MINUS • frator
+   20 functionCallStm: ID • LPAREN call_list_opt RPAREN
+   27 lvalue: ID •
 
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
+    LPAREN  shift, and go to state 43
 
-    frator  go to state 31
+    $default  reduce using rule 27 (lvalue)
 
 
 State 7
 
-   14 lvalue: ID •
-   28 frator: ID •
+    0 $accept: prog • $end
 
-    LBRACKET  reduce using rule 14 (lvalue)
-    DOT       reduce using rule 14 (lvalue)
-    ASSIGN    reduce using rule 14 (lvalue)
-    $default  reduce using rule 28 (frator)
+    $end  shift, and go to state 44
 
 
 State 8
-
-   29 frator: INTEGER_CONSTANT •
-
-    $default  reduce using rule 29 (frator)
-
-
-State 9
-
-    0 $accept: prog • $end
-
-    $end  shift, and go to state 32
-
-
-State 10
 
     1 prog: stm •
 
     $default  reduce using rule 1 (prog)
 
 
-State 11
+State 9
 
-    2 stm: assignStm •
-
-    $default  reduce using rule 2 (stm)
-
-
-State 12
-
-    3 stm: conditionStm •
-
-    $default  reduce using rule 3 (stm)
-
-
-State 13
-
-    4 stm: whileStm •
-
-    $default  reduce using rule 4 (stm)
-
-
-State 14
-
-    5 stm: forStm •
-
-    $default  reduce using rule 5 (stm)
-
-
-State 15
-
-    6 stm: letStm •
+    6 stm: assignStm •
 
     $default  reduce using rule 6 (stm)
 
 
-State 16
+State 10
 
-    8 assignStm: lvalue • ASSIGN algorithmExp
-   15 lvalue: lvalue • DOT ID
-   16       | lvalue • LBRACKET algorithmExp RBRACKET
-
-    LBRACKET  shift, and go to state 33
-    DOT       shift, and go to state 34
-    ASSIGN    shift, and go to state 35
-
-
-State 17
-
-    7 stm: algorithmExp •
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
-
-    PLUS   shift, and go to state 36
-    MINUS  shift, and go to state 37
+    7 stm: conditionStm •
 
     $default  reduce using rule 7 (stm)
 
 
+State 11
+
+    8 stm: whileStm •
+
+    $default  reduce using rule 8 (stm)
+
+
+State 12
+
+    9 stm: forStm •
+
+    $default  reduce using rule 9 (stm)
+
+
+State 13
+
+   10 stm: letStm •
+
+    $default  reduce using rule 10 (stm)
+
+
+State 14
+
+   12 stm: functionCallStm •
+
+    $default  reduce using rule 12 (stm)
+
+
+State 15
+
+   13 assignStm: lvalue • ASSIGN algorithmExp
+   14          | lvalue • ASSIGN NIL
+   28 lvalue: lvalue • DOT ID
+   29       | lvalue • LBRACKET numberExp RBRACKET
+
+    LBRACKET  shift, and go to state 45
+    DOT       shift, and go to state 46
+    ASSIGN    shift, and go to state 47
+
+
+State 16
+
+   18 forStm: FOR ID • ASSIGN numberExp TO numberExp DO stm
+
+    ASSIGN  shift, and go to state 48
+
+
+State 17
+
+   51 numberFrator: LPAREN • numberExp RPAREN
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberExp     go to state 49
+    numberItem    go to state 29
+    numberFrator  go to state 30
+
+
 State 18
 
-   22 algorithmExp: item •
-   26 item: item • MULTIPLY frator
-   27     | item • DIVIDE frator
+   48 numberFrator: MINUS • numberFrator
 
-    MULTIPLY  shift, and go to state 38
-    DIVIDE    shift, and go to state 39
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
 
-    $default  reduce using rule 22 (algorithmExp)
+    numberFrator  go to state 50
 
 
 State 19
 
-   25 item: frator •
+   49 numberFrator: ID •
 
-    $default  reduce using rule 25 (item)
+    $default  reduce using rule 49 (numberFrator)
 
 
 State 20
 
-   12 forStm: FOR ID • ASSIGN algorithmExp TO algorithmExp DO stm
+   50 numberFrator: INTEGER_CONSTANT •
 
-    ASSIGN  shift, and go to state 40
+    $default  reduce using rule 50 (numberFrator)
 
 
 State 21
 
-   28 frator: ID •
+   41 stringExp: STRING_CONSTANT •
 
-    $default  reduce using rule 28 (frator)
+    $default  reduce using rule 41 (stringExp)
 
 
 State 22
 
-    9 conditionStm: IF relationExp • THEN stm
-   10             | IF relationExp • THEN stm ELSE stm
-   18 relationExp: relationExp • AND relationExpItem
-   19            | relationExp • OR relationExpItem
+   15 conditionStm: IF relationExp • THEN stm
+   16             | IF relationExp • THEN stm ELSE stm
 
-    THEN  shift, and go to state 41
-    AND   shift, and go to state 42
-    OR    shift, and go to state 43
+    THEN  shift, and go to state 51
 
 
 State 23
 
-   17 relationExp: relationExpItem •
+   30 relationExp: relationExpOR •
+   32 relationExpOR: relationExpOR • OR relationExpAND
 
-    $default  reduce using rule 17 (relationExp)
+    OR  shift, and go to state 52
+
+    $default  reduce using rule 30 (relationExp)
 
 
 State 24
 
-   20 relationExpItem: algorithmExp • relationOp algorithmExp
-   21                | algorithmExp •
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
+   31 relationExpOR: relationExpAND •
+   34 relationExpAND: relationExpAND • AND relationExpItem
 
-    PLUS                   shift, and go to state 36
-    MINUS                  shift, and go to state 37
-    EQUAL                  shift, and go to state 44
-    NOT_EQUAL              shift, and go to state 45
-    LESS_THAN              shift, and go to state 46
-    LESS_THAN_OR_EQUAL     shift, and go to state 47
-    GREATER_THAN           shift, and go to state 48
-    GREATER_THAN_OR_EQUAL  shift, and go to state 49
+    AND  shift, and go to state 53
 
-    $default  reduce using rule 21 (relationExpItem)
-
-    relationOp  go to state 50
+    $default  reduce using rule 31 (relationExpOR)
 
 
 State 25
 
-   41 type_declaration: TYPE • ID EQUAL type
+   33 relationExpAND: relationExpItem •
 
-    ID  shift, and go to state 51
+    $default  reduce using rule 33 (relationExpAND)
 
 
 State 26
 
-   13 letStm: LET declaration_list • IN stm END
-   39 declaration_list: declaration_list • declaration
+   35 relationExpItem: algorithmExp • relationOp algorithmExp
+   36                | algorithmExp •
+   37                | algorithmExp • NOT_EQUAL NIL
+   38                | algorithmExp • EQUAL NIL
 
-    IN    shift, and go to state 52
-    TYPE  shift, and go to state 25
+    EQUAL                  shift, and go to state 54
+    NOT_EQUAL              shift, and go to state 55
+    LESS_THAN              shift, and go to state 56
+    LESS_THAN_OR_EQUAL     shift, and go to state 57
+    GREATER_THAN           shift, and go to state 58
+    GREATER_THAN_OR_EQUAL  shift, and go to state 59
 
-    declaration       go to state 53
-    type_declaration  go to state 28
+    $default  reduce using rule 36 (relationExpItem)
+
+    relationOp  go to state 60
 
 
 State 27
 
-   38 declaration_list: declaration •
+   40 algorithmExp: stringExp •
 
-    $default  reduce using rule 38 (declaration_list)
+    $default  reduce using rule 40 (algorithmExp)
 
 
 State 28
 
-   40 declaration: type_declaration •
+   39 algorithmExp: numberExp •
+   43 numberExp: numberExp • PLUS numberItem
+   44          | numberExp • MINUS numberItem
 
-    $default  reduce using rule 40 (declaration)
+    PLUS   shift, and go to state 61
+    MINUS  shift, and go to state 62
+
+    $default  reduce using rule 39 (algorithmExp)
 
 
 State 29
 
-   11 whileStm: WHILE relationExp • DO stm
-   18 relationExp: relationExp • AND relationExpItem
-   19            | relationExp • OR relationExpItem
+   42 numberExp: numberItem •
+   46 numberItem: numberItem • MULTIPLY numberFrator
+   47           | numberItem • DIVIDE numberFrator
 
-    DO   shift, and go to state 54
-    AND  shift, and go to state 42
-    OR   shift, and go to state 43
+    MULTIPLY  shift, and go to state 63
+    DIVIDE    shift, and go to state 64
+
+    $default  reduce using rule 42 (numberExp)
 
 
 State 30
 
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
-   30 frator: LPAREN algorithmExp • RPAREN
+   45 numberItem: numberFrator •
 
-    RPAREN  shift, and go to state 55
-    PLUS    shift, and go to state 36
-    MINUS   shift, and go to state 37
+    $default  reduce using rule 45 (numberItem)
 
 
 State 31
 
-   31 frator: MINUS frator •
+   83 function_declaration: FUNCTION • ID LPAREN type_fields_opt RPAREN EQUAL stm
+   84                     | FUNCTION • ID LPAREN type_fields_opt RPAREN COLON ID EQUAL stm
 
-    $default  reduce using rule 31 (frator)
+    ID  shift, and go to state 65
 
 
 State 32
+
+   63 type_declaration: TYPE • ID EQUAL type
+
+    ID  shift, and go to state 66
+
+
+State 33
+
+   72 variable_declaration: VAR • ID ASSIGN assignRValue
+   73                     | VAR • ID COLON ID ASSIGN assignRValue
+   74                     | VAR • ID COLON ID ASSIGN NIL
+
+    ID  shift, and go to state 67
+
+
+State 34
+
+   19 letStm: LET declaration_list • IN stm END
+   59 declaration_list: declaration_list • declaration
+
+    FUNCTION  shift, and go to state 31
+    IN        shift, and go to state 68
+    TYPE      shift, and go to state 32
+    VAR       shift, and go to state 33
+
+    declaration           go to state 69
+    type_declaration      go to state 36
+    variable_declaration  go to state 37
+    function_declaration  go to state 38
+
+
+State 35
+
+   58 declaration_list: declaration •
+
+    $default  reduce using rule 58 (declaration_list)
+
+
+State 36
+
+   60 declaration: type_declaration •
+
+    $default  reduce using rule 60 (declaration)
+
+
+State 37
+
+   61 declaration: variable_declaration •
+
+    $default  reduce using rule 61 (declaration)
+
+
+State 38
+
+   62 declaration: function_declaration •
+
+    $default  reduce using rule 62 (declaration)
+
+
+State 39
+
+   17 whileStm: WHILE relationExp • DO stm
+
+    DO  shift, and go to state 70
+
+
+State 40
+
+   11 stm: LPAREN stmBlock_opt • RPAREN
+
+    RPAREN  shift, and go to state 71
+
+
+State 41
+
+    2 stmBlock_opt: stmBlock •
+    5 stmBlock: stmBlock • SEMICOLON stm
+
+    SEMICOLON  shift, and go to state 72
+
+    $default  reduce using rule 2 (stmBlock_opt)
+
+
+State 42
+
+    4 stmBlock: stm •
+
+    $default  reduce using rule 4 (stmBlock)
+
+
+State 43
+
+   20 functionCallStm: ID LPAREN • call_list_opt RPAREN
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 73
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
+
+    $default  reduce using rule 22 (call_list_opt)
+
+    functionCallStm  go to state 74
+    call_list_opt    go to state 75
+    call_list        go to state 76
+    call_paramater   go to state 77
+    algorithmExp     go to state 78
+    stringExp        go to state 27
+    numberExp        go to state 28
+    numberItem       go to state 29
+    numberFrator     go to state 30
+
+
+State 44
 
     0 $accept: prog $end •
 
     $default  accept
 
 
-State 33
-
-   16 lvalue: lvalue LBRACKET • algorithmExp RBRACKET
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    algorithmExp  go to state 56
-    item          go to state 18
-    frator        go to state 19
-
-
-State 34
-
-   15 lvalue: lvalue DOT • ID
-
-    ID  shift, and go to state 57
-
-
-State 35
-
-    8 assignStm: lvalue ASSIGN • algorithmExp
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    algorithmExp  go to state 58
-    item          go to state 18
-    frator        go to state 19
-
-
-State 36
-
-   23 algorithmExp: algorithmExp PLUS • item
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    item    go to state 59
-    frator  go to state 19
-
-
-State 37
-
-   24 algorithmExp: algorithmExp MINUS • item
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    item    go to state 60
-    frator  go to state 19
-
-
-State 38
-
-   26 item: item MULTIPLY • frator
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    frator  go to state 61
-
-
-State 39
-
-   27 item: item DIVIDE • frator
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    frator  go to state 62
-
-
-State 40
-
-   12 forStm: FOR ID ASSIGN • algorithmExp TO algorithmExp DO stm
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    algorithmExp  go to state 63
-    item          go to state 18
-    frator        go to state 19
-
-
-State 41
-
-    9 conditionStm: IF relationExp THEN • stm
-   10             | IF relationExp THEN • stm ELSE stm
-
-    FOR               shift, and go to state 1
-    IF                shift, and go to state 2
-    LET               shift, and go to state 3
-    WHILE             shift, and go to state 4
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 7
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    stm           go to state 64
-    assignStm     go to state 11
-    conditionStm  go to state 12
-    whileStm      go to state 13
-    forStm        go to state 14
-    letStm        go to state 15
-    lvalue        go to state 16
-    algorithmExp  go to state 17
-    item          go to state 18
-    frator        go to state 19
-
-
-State 42
-
-   18 relationExp: relationExp AND • relationExpItem
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    relationExpItem  go to state 65
-    algorithmExp     go to state 24
-    item             go to state 18
-    frator           go to state 19
-
-
-State 43
-
-   19 relationExp: relationExp OR • relationExpItem
-
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    relationExpItem  go to state 66
-    algorithmExp     go to state 24
-    item             go to state 18
-    frator           go to state 19
-
-
-State 44
-
-   32 relationOp: EQUAL •
-
-    $default  reduce using rule 32 (relationOp)
-
-
 State 45
 
-   33 relationOp: NOT_EQUAL •
+   29 lvalue: lvalue LBRACKET • numberExp RBRACKET
 
-    $default  reduce using rule 33 (relationOp)
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberExp     go to state 79
+    numberItem    go to state 29
+    numberFrator  go to state 30
 
 
 State 46
 
-   35 relationOp: LESS_THAN •
+   28 lvalue: lvalue DOT • ID
 
-    $default  reduce using rule 35 (relationOp)
+    ID  shift, and go to state 80
 
 
 State 47
 
-   37 relationOp: LESS_THAN_OR_EQUAL •
+   13 assignStm: lvalue ASSIGN • algorithmExp
+   14          | lvalue ASSIGN • NIL
 
-    $default  reduce using rule 37 (relationOp)
+    NIL               shift, and go to state 81
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
+
+    algorithmExp  go to state 82
+    stringExp     go to state 27
+    numberExp     go to state 28
+    numberItem    go to state 29
+    numberFrator  go to state 30
 
 
 State 48
 
-   34 relationOp: GREATER_THAN •
+   18 forStm: FOR ID ASSIGN • numberExp TO numberExp DO stm
 
-    $default  reduce using rule 34 (relationOp)
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberExp     go to state 83
+    numberItem    go to state 29
+    numberFrator  go to state 30
 
 
 State 49
 
-   36 relationOp: GREATER_THAN_OR_EQUAL •
+   43 numberExp: numberExp • PLUS numberItem
+   44          | numberExp • MINUS numberItem
+   51 numberFrator: LPAREN numberExp • RPAREN
 
-    $default  reduce using rule 36 (relationOp)
+    RPAREN  shift, and go to state 84
+    PLUS    shift, and go to state 61
+    MINUS   shift, and go to state 62
 
 
 State 50
 
-   20 relationExpItem: algorithmExp relationOp • algorithmExp
+   48 numberFrator: MINUS numberFrator •
 
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
-
-    algorithmExp  go to state 67
-    item          go to state 18
-    frator        go to state 19
+    $default  reduce using rule 48 (numberFrator)
 
 
 State 51
 
-   41 type_declaration: TYPE ID • EQUAL type
+   15 conditionStm: IF relationExp THEN • stm
+   16             | IF relationExp THEN • stm ELSE stm
 
-    EQUAL  shift, and go to state 68
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
+
+    stm              go to state 85
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
 
 
 State 52
 
-   13 letStm: LET declaration_list IN • stm END
+   32 relationExpOR: relationExpOR OR • relationExpAND
 
-    FOR               shift, and go to state 1
-    IF                shift, and go to state 2
-    LET               shift, and go to state 3
-    WHILE             shift, and go to state 4
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 7
-    INTEGER_CONSTANT  shift, and go to state 8
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
 
-    stm           go to state 69
-    assignStm     go to state 11
-    conditionStm  go to state 12
-    whileStm      go to state 13
-    forStm        go to state 14
-    letStm        go to state 15
-    lvalue        go to state 16
-    algorithmExp  go to state 17
-    item          go to state 18
-    frator        go to state 19
+    relationExpAND   go to state 86
+    relationExpItem  go to state 25
+    algorithmExp     go to state 26
+    stringExp        go to state 27
+    numberExp        go to state 28
+    numberItem       go to state 29
+    numberFrator     go to state 30
 
 
 State 53
 
-   39 declaration_list: declaration_list declaration •
+   34 relationExpAND: relationExpAND AND • relationExpItem
 
-    $default  reduce using rule 39 (declaration_list)
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
+
+    relationExpItem  go to state 87
+    algorithmExp     go to state 26
+    stringExp        go to state 27
+    numberExp        go to state 28
+    numberItem       go to state 29
+    numberFrator     go to state 30
 
 
 State 54
 
-   11 whileStm: WHILE relationExp DO • stm
+   38 relationExpItem: algorithmExp EQUAL • NIL
+   52 relationOp: EQUAL •
 
-    FOR               shift, and go to state 1
-    IF                shift, and go to state 2
-    LET               shift, and go to state 3
-    WHILE             shift, and go to state 4
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 7
-    INTEGER_CONSTANT  shift, and go to state 8
+    NIL  shift, and go to state 88
 
-    stm           go to state 70
-    assignStm     go to state 11
-    conditionStm  go to state 12
-    whileStm      go to state 13
-    forStm        go to state 14
-    letStm        go to state 15
-    lvalue        go to state 16
-    algorithmExp  go to state 17
-    item          go to state 18
-    frator        go to state 19
+    $default  reduce using rule 52 (relationOp)
 
 
 State 55
 
-   30 frator: LPAREN algorithmExp RPAREN •
+   37 relationExpItem: algorithmExp NOT_EQUAL • NIL
+   53 relationOp: NOT_EQUAL •
 
-    $default  reduce using rule 30 (frator)
+    NIL  shift, and go to state 89
+
+    $default  reduce using rule 53 (relationOp)
 
 
 State 56
 
-   16 lvalue: lvalue LBRACKET algorithmExp • RBRACKET
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
+   55 relationOp: LESS_THAN •
 
-    RBRACKET  shift, and go to state 71
-    PLUS      shift, and go to state 36
-    MINUS     shift, and go to state 37
+    $default  reduce using rule 55 (relationOp)
 
 
 State 57
 
-   15 lvalue: lvalue DOT ID •
+   57 relationOp: LESS_THAN_OR_EQUAL •
 
-    $default  reduce using rule 15 (lvalue)
+    $default  reduce using rule 57 (relationOp)
 
 
 State 58
 
-    8 assignStm: lvalue ASSIGN algorithmExp •
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
+   54 relationOp: GREATER_THAN •
 
-    PLUS   shift, and go to state 36
-    MINUS  shift, and go to state 37
-
-    $default  reduce using rule 8 (assignStm)
+    $default  reduce using rule 54 (relationOp)
 
 
 State 59
 
-   23 algorithmExp: algorithmExp PLUS item •
-   26 item: item • MULTIPLY frator
-   27     | item • DIVIDE frator
+   56 relationOp: GREATER_THAN_OR_EQUAL •
 
-    MULTIPLY  shift, and go to state 38
-    DIVIDE    shift, and go to state 39
-
-    $default  reduce using rule 23 (algorithmExp)
+    $default  reduce using rule 56 (relationOp)
 
 
 State 60
 
-   24 algorithmExp: algorithmExp MINUS item •
-   26 item: item • MULTIPLY frator
-   27     | item • DIVIDE frator
+   35 relationExpItem: algorithmExp relationOp • algorithmExp
 
-    MULTIPLY  shift, and go to state 38
-    DIVIDE    shift, and go to state 39
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
 
-    $default  reduce using rule 24 (algorithmExp)
+    algorithmExp  go to state 90
+    stringExp     go to state 27
+    numberExp     go to state 28
+    numberItem    go to state 29
+    numberFrator  go to state 30
 
 
 State 61
 
-   26 item: item MULTIPLY frator •
+   43 numberExp: numberExp PLUS • numberItem
 
-    $default  reduce using rule 26 (item)
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberItem    go to state 91
+    numberFrator  go to state 30
 
 
 State 62
 
-   27 item: item DIVIDE frator •
+   44 numberExp: numberExp MINUS • numberItem
 
-    $default  reduce using rule 27 (item)
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberItem    go to state 92
+    numberFrator  go to state 30
 
 
 State 63
 
-   12 forStm: FOR ID ASSIGN algorithmExp • TO algorithmExp DO stm
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
+   46 numberItem: numberItem MULTIPLY • numberFrator
 
-    TO     shift, and go to state 72
-    PLUS   shift, and go to state 36
-    MINUS  shift, and go to state 37
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberFrator  go to state 93
 
 
 State 64
 
-    9 conditionStm: IF relationExp THEN stm •
-   10             | IF relationExp THEN stm • ELSE stm
+   47 numberItem: numberItem DIVIDE • numberFrator
 
-    ELSE  shift, and go to state 73
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
 
-    $default  reduce using rule 9 (conditionStm)
+    numberFrator  go to state 94
 
 
 State 65
 
-   18 relationExp: relationExp AND relationExpItem •
+   83 function_declaration: FUNCTION ID • LPAREN type_fields_opt RPAREN EQUAL stm
+   84                     | FUNCTION ID • LPAREN type_fields_opt RPAREN COLON ID EQUAL stm
 
-    $default  reduce using rule 18 (relationExp)
+    LPAREN  shift, and go to state 95
 
 
 State 66
 
-   19 relationExp: relationExp OR relationExpItem •
+   63 type_declaration: TYPE ID • EQUAL type
 
-    $default  reduce using rule 19 (relationExp)
+    EQUAL  shift, and go to state 96
 
 
 State 67
 
-   20 relationExpItem: algorithmExp relationOp algorithmExp •
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
+   72 variable_declaration: VAR ID • ASSIGN assignRValue
+   73                     | VAR ID • COLON ID ASSIGN assignRValue
+   74                     | VAR ID • COLON ID ASSIGN NIL
 
-    PLUS   shift, and go to state 36
-    MINUS  shift, and go to state 37
-
-    $default  reduce using rule 20 (relationExpItem)
+    COLON   shift, and go to state 97
+    ASSIGN  shift, and go to state 98
 
 
 State 68
 
-   41 type_declaration: TYPE ID EQUAL • type
+   19 letStm: LET declaration_list IN • stm END
 
-    ARRAY   shift, and go to state 74
-    LBRACE  shift, and go to state 75
-    ID      shift, and go to state 76
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
 
-    type  go to state 77
+    stm              go to state 99
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
 
 
 State 69
 
-   13 letStm: LET declaration_list IN stm • END
+   59 declaration_list: declaration_list declaration •
 
-    END  shift, and go to state 78
+    $default  reduce using rule 59 (declaration_list)
 
 
 State 70
 
-   11 whileStm: WHILE relationExp DO stm •
+   17 whileStm: WHILE relationExp DO • stm
 
-    $default  reduce using rule 11 (whileStm)
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
+
+    stm              go to state 100
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
 
 
 State 71
 
-   16 lvalue: lvalue LBRACKET algorithmExp RBRACKET •
+   11 stm: LPAREN stmBlock_opt RPAREN •
 
-    $default  reduce using rule 16 (lvalue)
+    $default  reduce using rule 11 (stm)
 
 
 State 72
 
-   12 forStm: FOR ID ASSIGN algorithmExp TO • algorithmExp DO stm
+    5 stmBlock: stmBlock SEMICOLON • stm
 
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 21
-    INTEGER_CONSTANT  shift, and go to state 8
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
 
-    algorithmExp  go to state 79
-    item          go to state 18
-    frator        go to state 19
+    stm              go to state 101
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
 
 
 State 73
 
-   10 conditionStm: IF relationExp THEN stm ELSE • stm
+   20 functionCallStm: ID • LPAREN call_list_opt RPAREN
+   49 numberFrator: ID •
 
-    FOR               shift, and go to state 1
-    IF                shift, and go to state 2
-    LET               shift, and go to state 3
-    WHILE             shift, and go to state 4
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 7
-    INTEGER_CONSTANT  shift, and go to state 8
+    LPAREN  shift, and go to state 43
 
-    stm           go to state 80
-    assignStm     go to state 11
-    conditionStm  go to state 12
-    whileStm      go to state 13
-    forStm        go to state 14
-    letStm        go to state 15
-    lvalue        go to state 16
-    algorithmExp  go to state 17
-    item          go to state 18
-    frator        go to state 19
+    $default  reduce using rule 49 (numberFrator)
 
 
 State 74
 
-   44 type: ARRAY • OF ID
+   26 call_paramater: functionCallStm •
 
-    OF  shift, and go to state 81
+    $default  reduce using rule 26 (call_paramater)
 
 
 State 75
 
-   43 type: LBRACE • type_fields_opt RBRACE
+   20 functionCallStm: ID LPAREN call_list_opt • RPAREN
 
-    ID  shift, and go to state 82
-
-    $default  reduce using rule 46 (type_fields_opt)
-
-    type_fields_opt  go to state 83
-    type_fields      go to state 84
-    type_field       go to state 85
+    RPAREN  shift, and go to state 102
 
 
 State 76
 
-   42 type: ID •
+   21 call_list_opt: call_list •
+   24 call_list: call_list • COMMA call_paramater
 
-    $default  reduce using rule 42 (type)
+    COMMA  shift, and go to state 103
+
+    $default  reduce using rule 21 (call_list_opt)
 
 
 State 77
 
-   41 type_declaration: TYPE ID EQUAL type •
+   23 call_list: call_paramater •
 
-    $default  reduce using rule 41 (type_declaration)
+    $default  reduce using rule 23 (call_list)
 
 
 State 78
 
-   13 letStm: LET declaration_list IN stm END •
+   25 call_paramater: algorithmExp •
 
-    $default  reduce using rule 13 (letStm)
+    $default  reduce using rule 25 (call_paramater)
 
 
 State 79
 
-   12 forStm: FOR ID ASSIGN algorithmExp TO algorithmExp • DO stm
-   23 algorithmExp: algorithmExp • PLUS item
-   24             | algorithmExp • MINUS item
+   29 lvalue: lvalue LBRACKET numberExp • RBRACKET
+   43 numberExp: numberExp • PLUS numberItem
+   44          | numberExp • MINUS numberItem
 
-    DO     shift, and go to state 86
-    PLUS   shift, and go to state 36
-    MINUS  shift, and go to state 37
+    RBRACKET  shift, and go to state 104
+    PLUS      shift, and go to state 61
+    MINUS     shift, and go to state 62
 
 
 State 80
 
-   10 conditionStm: IF relationExp THEN stm ELSE stm •
+   28 lvalue: lvalue DOT ID •
 
-    $default  reduce using rule 10 (conditionStm)
+    $default  reduce using rule 28 (lvalue)
 
 
 State 81
 
-   44 type: ARRAY OF • ID
+   14 assignStm: lvalue ASSIGN NIL •
 
-    ID  shift, and go to state 87
+    $default  reduce using rule 14 (assignStm)
 
 
 State 82
 
-   49 type_field: ID • COLON ID
+   13 assignStm: lvalue ASSIGN algorithmExp •
 
-    COLON  shift, and go to state 88
+    $default  reduce using rule 13 (assignStm)
 
 
 State 83
 
-   43 type: LBRACE type_fields_opt • RBRACE
+   18 forStm: FOR ID ASSIGN numberExp • TO numberExp DO stm
+   43 numberExp: numberExp • PLUS numberItem
+   44          | numberExp • MINUS numberItem
 
-    RBRACE  shift, and go to state 89
+    TO     shift, and go to state 105
+    PLUS   shift, and go to state 61
+    MINUS  shift, and go to state 62
 
 
 State 84
 
-   45 type_fields_opt: type_fields •
-   48 type_fields: type_fields • COMMA type_field
+   51 numberFrator: LPAREN numberExp RPAREN •
 
-    COMMA  shift, and go to state 90
-
-    $default  reduce using rule 45 (type_fields_opt)
+    $default  reduce using rule 51 (numberFrator)
 
 
 State 85
 
-   47 type_fields: type_field •
+   15 conditionStm: IF relationExp THEN stm •
+   16             | IF relationExp THEN stm • ELSE stm
 
-    $default  reduce using rule 47 (type_fields)
+    ELSE  shift, and go to state 106
+
+    $default  reduce using rule 15 (conditionStm)
 
 
 State 86
 
-   12 forStm: FOR ID ASSIGN algorithmExp TO algorithmExp DO • stm
+   32 relationExpOR: relationExpOR OR relationExpAND •
+   34 relationExpAND: relationExpAND • AND relationExpItem
 
-    FOR               shift, and go to state 1
-    IF                shift, and go to state 2
-    LET               shift, and go to state 3
-    WHILE             shift, and go to state 4
-    LPAREN            shift, and go to state 5
-    MINUS             shift, and go to state 6
-    ID                shift, and go to state 7
-    INTEGER_CONSTANT  shift, and go to state 8
+    AND  shift, and go to state 53
 
-    stm           go to state 91
-    assignStm     go to state 11
-    conditionStm  go to state 12
-    whileStm      go to state 13
-    forStm        go to state 14
-    letStm        go to state 15
-    lvalue        go to state 16
-    algorithmExp  go to state 17
-    item          go to state 18
-    frator        go to state 19
+    $default  reduce using rule 32 (relationExpOR)
 
 
 State 87
 
-   44 type: ARRAY OF ID •
+   34 relationExpAND: relationExpAND AND relationExpItem •
 
-    $default  reduce using rule 44 (type)
+    $default  reduce using rule 34 (relationExpAND)
 
 
 State 88
 
-   49 type_field: ID COLON • ID
+   38 relationExpItem: algorithmExp EQUAL NIL •
 
-    ID  shift, and go to state 92
+    $default  reduce using rule 38 (relationExpItem)
 
 
 State 89
 
-   43 type: LBRACE type_fields_opt RBRACE •
+   37 relationExpItem: algorithmExp NOT_EQUAL NIL •
 
-    $default  reduce using rule 43 (type)
+    $default  reduce using rule 37 (relationExpItem)
 
 
 State 90
 
-   48 type_fields: type_fields COMMA • type_field
+   35 relationExpItem: algorithmExp relationOp algorithmExp •
 
-    ID  shift, and go to state 82
-
-    type_field  go to state 93
+    $default  reduce using rule 35 (relationExpItem)
 
 
 State 91
 
-   12 forStm: FOR ID ASSIGN algorithmExp TO algorithmExp DO stm •
+   43 numberExp: numberExp PLUS numberItem •
+   46 numberItem: numberItem • MULTIPLY numberFrator
+   47           | numberItem • DIVIDE numberFrator
 
-    $default  reduce using rule 12 (forStm)
+    MULTIPLY  shift, and go to state 63
+    DIVIDE    shift, and go to state 64
+
+    $default  reduce using rule 43 (numberExp)
 
 
 State 92
 
-   49 type_field: ID COLON ID •
+   44 numberExp: numberExp MINUS numberItem •
+   46 numberItem: numberItem • MULTIPLY numberFrator
+   47           | numberItem • DIVIDE numberFrator
 
-    $default  reduce using rule 49 (type_field)
+    MULTIPLY  shift, and go to state 63
+    DIVIDE    shift, and go to state 64
+
+    $default  reduce using rule 44 (numberExp)
 
 
 State 93
 
-   48 type_fields: type_fields COMMA type_field •
+   46 numberItem: numberItem MULTIPLY numberFrator •
 
-    $default  reduce using rule 48 (type_fields)
+    $default  reduce using rule 46 (numberItem)
+
+
+State 94
+
+   47 numberItem: numberItem DIVIDE numberFrator •
+
+    $default  reduce using rule 47 (numberItem)
+
+
+State 95
+
+   83 function_declaration: FUNCTION ID LPAREN • type_fields_opt RPAREN EQUAL stm
+   84                     | FUNCTION ID LPAREN • type_fields_opt RPAREN COLON ID EQUAL stm
+
+    ID  shift, and go to state 107
+
+    $default  reduce using rule 68 (type_fields_opt)
+
+    type_fields_opt  go to state 108
+    type_fields      go to state 109
+    type_field       go to state 110
+
+
+State 96
+
+   63 type_declaration: TYPE ID EQUAL • type
+
+    ARRAY   shift, and go to state 111
+    LBRACE  shift, and go to state 112
+    ID      shift, and go to state 113
+
+    type  go to state 114
+
+
+State 97
+
+   73 variable_declaration: VAR ID COLON • ID ASSIGN assignRValue
+   74                     | VAR ID COLON • ID ASSIGN NIL
+
+    ID  shift, and go to state 115
+
+
+State 98
+
+   72 variable_declaration: VAR ID ASSIGN • assignRValue
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 116
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
+
+    algorithmExp  go to state 117
+    stringExp     go to state 27
+    numberExp     go to state 28
+    numberItem    go to state 29
+    numberFrator  go to state 30
+    assignRValue  go to state 118
+
+
+State 99
+
+   19 letStm: LET declaration_list IN stm • END
+
+    END  shift, and go to state 119
+
+
+State 100
+
+   17 whileStm: WHILE relationExp DO stm •
+
+    $default  reduce using rule 17 (whileStm)
+
+
+State 101
+
+    5 stmBlock: stmBlock SEMICOLON stm •
+
+    $default  reduce using rule 5 (stmBlock)
+
+
+State 102
+
+   20 functionCallStm: ID LPAREN call_list_opt RPAREN •
+
+    $default  reduce using rule 20 (functionCallStm)
+
+
+State 103
+
+   24 call_list: call_list COMMA • call_paramater
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 73
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
+
+    functionCallStm  go to state 74
+    call_paramater   go to state 120
+    algorithmExp     go to state 78
+    stringExp        go to state 27
+    numberExp        go to state 28
+    numberItem       go to state 29
+    numberFrator     go to state 30
+
+
+State 104
+
+   29 lvalue: lvalue LBRACKET numberExp RBRACKET •
+
+    $default  reduce using rule 29 (lvalue)
+
+
+State 105
+
+   18 forStm: FOR ID ASSIGN numberExp TO • numberExp DO stm
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberExp     go to state 121
+    numberItem    go to state 29
+    numberFrator  go to state 30
+
+
+State 106
+
+   16 conditionStm: IF relationExp THEN stm ELSE • stm
+
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
+
+    stm              go to state 122
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
+
+
+State 107
+
+   71 type_field: ID • COLON ID
+
+    COLON  shift, and go to state 123
+
+
+State 108
+
+   83 function_declaration: FUNCTION ID LPAREN type_fields_opt • RPAREN EQUAL stm
+   84                     | FUNCTION ID LPAREN type_fields_opt • RPAREN COLON ID EQUAL stm
+
+    RPAREN  shift, and go to state 124
+
+
+State 109
+
+   67 type_fields_opt: type_fields •
+   70 type_fields: type_fields • COMMA type_field
+
+    COMMA  shift, and go to state 125
+
+    $default  reduce using rule 67 (type_fields_opt)
+
+
+State 110
+
+   69 type_fields: type_field •
+
+    $default  reduce using rule 69 (type_fields)
+
+
+State 111
+
+   66 type: ARRAY • OF ID
+
+    OF  shift, and go to state 126
+
+
+State 112
+
+   65 type: LBRACE • type_fields_opt RBRACE
+
+    ID  shift, and go to state 107
+
+    $default  reduce using rule 68 (type_fields_opt)
+
+    type_fields_opt  go to state 127
+    type_fields      go to state 109
+    type_field       go to state 110
+
+
+State 113
+
+   64 type: ID •
+
+    $default  reduce using rule 64 (type)
+
+
+State 114
+
+   63 type_declaration: TYPE ID EQUAL type •
+
+    $default  reduce using rule 63 (type_declaration)
+
+
+State 115
+
+   73 variable_declaration: VAR ID COLON ID • ASSIGN assignRValue
+   74                     | VAR ID COLON ID • ASSIGN NIL
+
+    ASSIGN  shift, and go to state 128
+
+
+State 116
+
+   49 numberFrator: ID •
+   76 assignRValue: ID • LBRACKET numberExp RBRACKET OF numberExp
+   77             | ID • LBRACE field_list_opt RBRACE
+
+    LBRACKET  shift, and go to state 129
+    LBRACE    shift, and go to state 130
+
+    $default  reduce using rule 49 (numberFrator)
+
+
+State 117
+
+   75 assignRValue: algorithmExp •
+
+    $default  reduce using rule 75 (assignRValue)
+
+
+State 118
+
+   72 variable_declaration: VAR ID ASSIGN assignRValue •
+
+    $default  reduce using rule 72 (variable_declaration)
+
+
+State 119
+
+   19 letStm: LET declaration_list IN stm END •
+
+    $default  reduce using rule 19 (letStm)
+
+
+State 120
+
+   24 call_list: call_list COMMA call_paramater •
+
+    $default  reduce using rule 24 (call_list)
+
+
+State 121
+
+   18 forStm: FOR ID ASSIGN numberExp TO numberExp • DO stm
+   43 numberExp: numberExp • PLUS numberItem
+   44          | numberExp • MINUS numberItem
+
+    DO     shift, and go to state 131
+    PLUS   shift, and go to state 61
+    MINUS  shift, and go to state 62
+
+
+State 122
+
+   16 conditionStm: IF relationExp THEN stm ELSE stm •
+
+    $default  reduce using rule 16 (conditionStm)
+
+
+State 123
+
+   71 type_field: ID COLON • ID
+
+    ID  shift, and go to state 132
+
+
+State 124
+
+   83 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN • EQUAL stm
+   84                     | FUNCTION ID LPAREN type_fields_opt RPAREN • COLON ID EQUAL stm
+
+    COLON  shift, and go to state 133
+    EQUAL  shift, and go to state 134
+
+
+State 125
+
+   70 type_fields: type_fields COMMA • type_field
+
+    ID  shift, and go to state 107
+
+    type_field  go to state 135
+
+
+State 126
+
+   66 type: ARRAY OF • ID
+
+    ID  shift, and go to state 136
+
+
+State 127
+
+   65 type: LBRACE type_fields_opt • RBRACE
+
+    RBRACE  shift, and go to state 137
+
+
+State 128
+
+   73 variable_declaration: VAR ID COLON ID ASSIGN • assignRValue
+   74                     | VAR ID COLON ID ASSIGN • NIL
+
+    NIL               shift, and go to state 138
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 116
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
+
+    algorithmExp  go to state 117
+    stringExp     go to state 27
+    numberExp     go to state 28
+    numberItem    go to state 29
+    numberFrator  go to state 30
+    assignRValue  go to state 139
+
+
+State 129
+
+   76 assignRValue: ID LBRACKET • numberExp RBRACKET OF numberExp
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberExp     go to state 140
+    numberItem    go to state 29
+    numberFrator  go to state 30
+
+
+State 130
+
+   77 assignRValue: ID LBRACE • field_list_opt RBRACE
+
+    ID  shift, and go to state 141
+
+    $default  reduce using rule 79 (field_list_opt)
+
+    field_list_opt  go to state 142
+    field_list      go to state 143
+    field           go to state 144
+
+
+State 131
+
+   18 forStm: FOR ID ASSIGN numberExp TO numberExp DO • stm
+
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
+
+    stm              go to state 145
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
+
+
+State 132
+
+   71 type_field: ID COLON ID •
+
+    $default  reduce using rule 71 (type_field)
+
+
+State 133
+
+   84 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN COLON • ID EQUAL stm
+
+    ID  shift, and go to state 146
+
+
+State 134
+
+   83 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN EQUAL • stm
+
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
+
+    stm              go to state 147
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
+
+
+State 135
+
+   70 type_fields: type_fields COMMA type_field •
+
+    $default  reduce using rule 70 (type_fields)
+
+
+State 136
+
+   66 type: ARRAY OF ID •
+
+    $default  reduce using rule 66 (type)
+
+
+State 137
+
+   65 type: LBRACE type_fields_opt RBRACE •
+
+    $default  reduce using rule 65 (type)
+
+
+State 138
+
+   74 variable_declaration: VAR ID COLON ID ASSIGN NIL •
+
+    $default  reduce using rule 74 (variable_declaration)
+
+
+State 139
+
+   73 variable_declaration: VAR ID COLON ID ASSIGN assignRValue •
+
+    $default  reduce using rule 73 (variable_declaration)
+
+
+State 140
+
+   43 numberExp: numberExp • PLUS numberItem
+   44          | numberExp • MINUS numberItem
+   76 assignRValue: ID LBRACKET numberExp • RBRACKET OF numberExp
+
+    RBRACKET  shift, and go to state 148
+    PLUS      shift, and go to state 61
+    MINUS     shift, and go to state 62
+
+
+State 141
+
+   82 field: ID • EQUAL algorithmExp
+
+    EQUAL  shift, and go to state 149
+
+
+State 142
+
+   77 assignRValue: ID LBRACE field_list_opt • RBRACE
+
+    RBRACE  shift, and go to state 150
+
+
+State 143
+
+   78 field_list_opt: field_list •
+   81 field_list: field_list • COMMA field
+
+    COMMA  shift, and go to state 151
+
+    $default  reduce using rule 78 (field_list_opt)
+
+
+State 144
+
+   80 field_list: field •
+
+    $default  reduce using rule 80 (field_list)
+
+
+State 145
+
+   18 forStm: FOR ID ASSIGN numberExp TO numberExp DO stm •
+
+    $default  reduce using rule 18 (forStm)
+
+
+State 146
+
+   84 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN COLON ID • EQUAL stm
+
+    EQUAL  shift, and go to state 152
+
+
+State 147
+
+   83 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN EQUAL stm •
+
+    $default  reduce using rule 83 (function_declaration)
+
+
+State 148
+
+   76 assignRValue: ID LBRACKET numberExp RBRACKET • OF numberExp
+
+    OF  shift, and go to state 153
+
+
+State 149
+
+   82 field: ID EQUAL • algorithmExp
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+    STRING_CONSTANT   shift, and go to state 21
+
+    algorithmExp  go to state 154
+    stringExp     go to state 27
+    numberExp     go to state 28
+    numberItem    go to state 29
+    numberFrator  go to state 30
+
+
+State 150
+
+   77 assignRValue: ID LBRACE field_list_opt RBRACE •
+
+    $default  reduce using rule 77 (assignRValue)
+
+
+State 151
+
+   81 field_list: field_list COMMA • field
+
+    ID  shift, and go to state 141
+
+    field  go to state 155
+
+
+State 152
+
+   84 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN COLON ID EQUAL • stm
+
+    FOR     shift, and go to state 1
+    IF      shift, and go to state 2
+    LET     shift, and go to state 3
+    WHILE   shift, and go to state 4
+    LPAREN  shift, and go to state 5
+    ID      shift, and go to state 6
+
+    stm              go to state 156
+    assignStm        go to state 9
+    conditionStm     go to state 10
+    whileStm         go to state 11
+    forStm           go to state 12
+    letStm           go to state 13
+    functionCallStm  go to state 14
+    lvalue           go to state 15
+
+
+State 153
+
+   76 assignRValue: ID LBRACKET numberExp RBRACKET OF • numberExp
+
+    LPAREN            shift, and go to state 17
+    MINUS             shift, and go to state 18
+    ID                shift, and go to state 19
+    INTEGER_CONSTANT  shift, and go to state 20
+
+    numberExp     go to state 157
+    numberItem    go to state 29
+    numberFrator  go to state 30
+
+
+State 154
+
+   82 field: ID EQUAL algorithmExp •
+
+    $default  reduce using rule 82 (field)
+
+
+State 155
+
+   81 field_list: field_list COMMA field •
+
+    $default  reduce using rule 81 (field_list)
+
+
+State 156
+
+   84 function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN COLON ID EQUAL stm •
+
+    $default  reduce using rule 84 (function_declaration)
+
+
+State 157
+
+   43 numberExp: numberExp • PLUS numberItem
+   44          | numberExp • MINUS numberItem
+   76 assignRValue: ID LBRACKET numberExp RBRACKET OF numberExp •
+
+    PLUS   shift, and go to state 61
+    MINUS  shift, and go to state 62
+
+    $default  reduce using rule 76 (assignRValue)
