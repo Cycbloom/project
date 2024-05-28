@@ -135,113 +135,154 @@ tree_node Lable(string l)
     return t;
 }
 
-void print_tree_node(tree_node t){
-    if(t == NULL)
+void generateDotFile(tree_node root, const char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
+        fprintf(stderr, "Error opening file\n");
         return;
-    switch(t->kind){
+    }
+
+    fprintf(file, "digraph G {\n");
+
+    // 生成 DOT 文件
+    print_tree_node(file, root);
+
+    fprintf(file, "}\n");
+    fclose(file);
+}
+
+void print_tree_node(FILE *file, tree_node node){
+    if (node == NULL) {
+        return;
+    }
+
+    // 输出当前节点
+    switch (node->kind) {
         case CONST:
-            printf("[CONST %d]\n", t->u.consti);
+            fprintf(file, "node%p [label=\"CONST %d\"];\n", node, node->u.consti);
             break;
         case NAME:
-            printf("[NAME %s]\n", t->u.name);
+            fprintf(file, "node%p [label=\"NAME %s\"];\n", node, node->u.name);
             break;
         case TEMP:
-            printf("[TEMP\n");
-            printf("\t");
-            print_tree_node(t->u.temp);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"TEMP\"];\n", node);
             break;
         case BINOP:
-            printf("[BINOP\n");
-            printf("\t");
-            printf("op: %d\n", t->u.binop.op);
-            printf("\t");
-            print_tree_node(t->u.binop.left);
-            printf("\t");
-            print_tree_node(t->u.binop.right);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"BINOP %s\"];\n", node, binop_to_string(node->u.binop.op));
             break;
         case MEM:
-            printf("[MEM\n");
-            printf("\t");
-            print_tree_node(t->u.mem);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"MEM\"];\n", node);
             break;
         case CALL:
-            printf("[CALL\n");
-            printf("\t");
-            print_tree_node(t->u.call.func);
-            printf("\t");
-            print_tree_node_list(t->u.call.args);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"CALL\"];\n", node);
             break;
         case ESEQ:
-            printf("[ESEQ\n");
-            printf("\t");
-            print_tree_node(t->u.eseq.stm);
-            printf("\t");
-            print_tree_node(t->u.eseq.exp);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"ESEQ\"];\n", node);
             break;
         case MOVE:
-            printf("[MOVE\n");
-            printf("\t");
-            print_tree_node(t->u.move.dst);
-            printf("\t");
-            print_tree_node(t->u.move.src);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"MOVE\"];\n", node);
             break;
         case EXP:
-            printf("[EXP\n");
-            printf("\t");
-            print_tree_node(t->u.exp);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"EXP\"];\n", node);
             break;
         case JUMP:
-            printf("[JUMP\n");
-            printf("\t");
-            print_tree_node(t->u.jump);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"JUMP\"];\n", node);
             break;
         case CJUMP:
-            printf("[CJUMP\n");
-            printf("\t");
-            printf("op: %d\n", t->u.cjump.op);
-            printf("\t");
-            print_tree_node(t->u.cjump.left);
-            printf("\t");
-            print_tree_node(t->u.cjump.right);
-            printf("\t");
-            print_tree_node(t->u.cjump.t);
-            printf("\t");
-            print_tree_node(t->u.cjump.f);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"CJUMP\"];\n", node);
             break;
         case SEQ:
-            printf("[SEQ\n");
-            printf("\t");
-            print_tree_node(t->u.seq.left);
-            printf("\t");
-            print_tree_node(t->u.seq.right);
-            printf("]\n");
+            fprintf(file, "node%p [label=\"SEQ\"];\n", node);
             break;
         case LABLE:
-            printf("[LABLE %s]\n", t->u.lable);
+            fprintf(file, "node%p [label=\"LABLE %s\"];\n", node, node->u.lable);
             break;
         default:
-            printf("error\n");
+            fprintf(file, "node%p [label=\"UNKNOWN\"];\n", node);
             break;
+    }
+
+    // 递归处理子节点
+    if (node->kind == BINOP) {
+        print_tree_node(file, node->u.binop.left);
+        print_tree_node(file, node->u.binop.right);
+        fprintf(file, "node%p -> node%p;\n", node, node->u.binop.left);
+        fprintf(file, "node%p -> node%p;\n", node, node->u.binop.right);
+    } else if (node->kind == MEM) {
+        print_tree_node(file, node->u.mem);
+        fprintf(file, "node%p -> node%p;\n", node, node->u.mem);
+    } else if (node->kind == CALL) {
+        print_tree_node(file, node->u.call.func);
+        fprintf(file, "node%p -> node%p [label=\"func\"];\n", node, node->u.call.func);
+        tree_node_list args = node->u.call.args;
+        while (args != NULL) {
+            print_tree_node(file, args->head);
+            fprintf(file, "node%p -> node%p [label=\"args\"];\n", node, args->head);
+            args = args->tail;
+        }
+    } else if (node->kind == ESEQ) {
+        print_tree_node(file, node->u.eseq.stm);
+        print_tree_node(file, node->u.eseq.exp);
+        fprintf(file, "node%p -> node%p [label=\"stm\"];\n", node, node->u.eseq.stm);
+        fprintf(file, "node%p -> node%p [label=\"exp\"];\n", node, node->u.eseq.exp);
+    } else if (node->kind == MOVE) {
+        print_tree_node(file, node->u.move.dst);
+        print_tree_node(file, node->u.move.src);
+        fprintf(file, "node%p -> node%p [label=\"dst\"];\n", node, node->u.move.dst);
+        fprintf(file, "node%p -> node%p [label=\"src\"];\n", node, node->u.move.src);
+    } else if (node->kind == EXP) {
+        print_tree_node(file, node->u.exp);
+        fprintf(file, "node%p -> node%p;\n", node, node->u.exp);
+    } else if (node->kind == JUMP) {
+        print_tree_node(file, node->u.jump);
+        fprintf(file, "node%p -> node%p [label=\"dst\"];\n", node, node->u.jump);
+    } else if (node->kind == CJUMP) {
+        print_tree_node(file, node->u.cjump.left);
+        print_tree_node(file, node->u.cjump.right);
+        print_tree_node(file, node->u.cjump.t);
+        print_tree_node(file, node->u.cjump.f);
+        fprintf(file, "node%p -> node%p [label=\"left\"];\n", node, node->u.cjump.left);
+        fprintf(file, "node%p -> node%p [label=\"right\"];\n", node, node->u.cjump.right);
+        fprintf(file, "node%p -> node%p [label=\"true \"];\n", node, node->u.cjump.t);
+        fprintf(file, "node%p -> node%p [label=\"false\"];\n", node, node->u.cjump.f);
+    } else if (node->kind == SEQ) {
+        print_tree_node(file, node->u.seq.left);
+        print_tree_node(file, node->u.seq.right);
+        fprintf(file, "node%p -> node%p;\n", node, node->u.seq.left);
+        fprintf(file, "node%p -> node%p;\n", node, node->u.seq.right);
     }
 }
 
+const char* binop_to_string(enum BINOP op) {
+    switch (op) {
+        case BINOP_PLUS:
+            return "PLUS";
+        case BINOP_MINUS:
+            return "MINUS";
+        case BINOP_MUL:
+            return "MUL";
+        case BINOP_DIV:
+            return "DIV";
+        case BINOP_AND:
+            return "AND";
+        case BINOP_OR:
+            return "OR";
+        case BINOP_LSHIFT:
+            return "LSHIFT";
+        case BINOP_RSHIFT:
+            return "RSHIFT";
+        case BINOP_ARSHIFT:
+            return "ARSHIFT";
+        case BINOP_XOR:
+            return "XOR";
+        default:
+            return "UNKNOWN_BINOP";
+    }
+}
+
+
 void print_tree_node_list(tree_node_list l){
-    if(l == NULL)
-        return;
-    printf("[");
-    print_tree_node(l->head);
-    printf(", ");
-    print_tree_node_list(l->tail);
-    printf("]");
+
 }
 
 /*

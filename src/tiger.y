@@ -53,7 +53,9 @@ tree_node program = NULL;
 
 %%
 
-prog : stm	{printf("语法分析成功！\n"); program = prog($1);print_tree_node(program);}
+prog : stm	{printf("语法分析成功！\n"); program = prog($1);
+            generateDotFile(program,"tree.dot");
+            }
 	;
 
 stmBlock_opt: stmBlock { $$ = stmBlock_opt($1); }

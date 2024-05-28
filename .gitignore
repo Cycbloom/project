@@ -3,3 +3,5 @@ build/tiger
 build/y.output
 build/y.tab.h
 build/y.tab.c
+tree.dot
+tree.png

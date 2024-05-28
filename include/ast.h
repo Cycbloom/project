@@ -59,8 +59,10 @@ tree_node Cjump(enum relop op, tree_node l, tree_node r, tree_node t, tree_node 
 tree_node Seq(tree_node l, tree_node r);
 tree_node Lable(string l);
 
-void print_tree_node(tree_node t);
+void generateDotFile(tree_node root, const char *filename);
+void print_tree_node(FILE *file, tree_node t);
 void print_tree_node_list(tree_node_list l);
+const char* binop_to_string(enum BINOP op);
 
 tree_node_list Tree_node_list(tree_node h, tree_node_list t);
 tree_node Tree_node_list_get(tree_node_list l);
