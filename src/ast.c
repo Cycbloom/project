@@ -1,4 +1,5 @@
 #include"ast.h"
+#include<stdlib.h>
 
 tree_node_list true_call_list = NULL;
 tree_node_list false_call_list = NULL;
@@ -18,7 +19,9 @@ tree_node Tree_node_list_get(tree_node_list l)
 
 tree_node_list Tree_node_list_pop(tree_node_list l)
 {
-    return l->tail;
+    tree_node_list t = l->tail;
+    free(l);
+    return t;
 }
 
 tree_node Const(int i)
@@ -189,7 +192,7 @@ void print_tree_node(FILE *file, tree_node node){
             fprintf(file, "node%p [label=\"JUMP\"];\n", node);
             break;
         case CJUMP:
-            fprintf(file, "node%p [label=\"CJUMP\"];\n", node);
+            fprintf(file, "node%p [label=\"CJUMP %s\"];\n", node, relop_to_string(node->u.cjump.op));
             break;
         case SEQ:
             fprintf(file, "node%p [label=\"SEQ\"];\n", node);
@@ -248,8 +251,8 @@ void print_tree_node(FILE *file, tree_node node){
     } else if (node->kind == SEQ) {
         print_tree_node(file, node->u.seq.left);
         print_tree_node(file, node->u.seq.right);
-        fprintf(file, "node%p -> node%p;\n", node, node->u.seq.left);
-        fprintf(file, "node%p -> node%p;\n", node, node->u.seq.right);
+        fprintf(file, "node%p -> node%p [label=\"left\"];\n", node, node->u.seq.left);
+        fprintf(file, "node%p -> node%p [label=\"right\"];\n", node, node->u.seq.right);
     }
 }
 
@@ -280,9 +283,31 @@ const char* binop_to_string(enum BINOP op) {
     }
 }
 
-
-void print_tree_node_list(tree_node_list l){
-
+const char* relop_to_string(enum relop op) {
+    switch (op) {
+        case EQ:
+            return "EQ";
+        case NE:
+            return "NE";
+        case LT:
+            return "LT";
+        case GT:
+            return "GT";
+        case LE:
+            return "LE";
+        case GE:
+            return "GE";
+        case ULT:
+            return "ULT";
+        case ULE:
+            return "ULE";
+        case UGT:
+            return "UGT";
+        case UGE:
+            return "UGE";
+        default:
+            return "UNKNOWN_RELOP";
+    }
 }
 
 /*
@@ -481,9 +506,15 @@ tree_node relationExpAND_AND(tree_node l, tree_node r)
     tree_node true_label = Lable("true");
     tree_node temp = Seq(l, true_label);
     temp = Seq(temp, r);
-    tree_node true_call_node = Tree_node_list_get(true_call_list);
+
+    tree_node true_call_node_save = Tree_node_list_get(true_call_list);//this is r
+    true_call_list = Tree_node_list_pop(true_call_list);
+
+    tree_node true_call_node = Tree_node_list_get(true_call_list); //this is l's right end node
     true_call_node->u.cjump.t = true_label;
     true_call_list = Tree_node_list_pop(true_call_list);
+
+    true_call_list = Tree_node_list(true_call_node_save, true_call_list);
     return temp;
 }
 
@@ -503,12 +534,16 @@ tree_node relationExpOR_OR(tree_node l, tree_node r)
     tree_node false_label = Lable("false");
     tree_node temp = Seq(l, false_label);
     temp = Seq(temp, r);
+
+    tree_node false_call_node_save = Tree_node_list_get(false_call_list);//this is r
+    false_call_list = Tree_node_list_pop(false_call_list);
     while(false_call_list != NULL)
     {
         tree_node false_call_node = Tree_node_list_get(false_call_list);
         false_call_node->u.cjump.f = false_label;
         false_call_list = Tree_node_list_pop(false_call_list);
     }
+    false_call_list = Tree_node_list(false_call_node_save, false_call_list);
     return temp;
 }
 
