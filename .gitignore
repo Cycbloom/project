@@ -1,0 +1,5 @@
+build/lex.yy.c
+build/tiger
+build/y.output
+build/y.tab.h
+build/y.tab.c
