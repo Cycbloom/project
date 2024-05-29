@@ -1,10 +1,13 @@
 %{
 #include "ast.h"
+#include"declaration.h"
 #include <stdio.h>
 #include <string.h>
 #include "util.h"
 #include "errormsg.h"
 #define YYDEBUG 1 
+
+extern FILE *yyin;
 
 int yylex(void);
 void yyerror(char* s); 
@@ -23,6 +26,18 @@ tree_node program = NULL;
     tree_node node;
     tree_node_list node_list;
     enum relop reOp;
+
+    field field;
+    field_list field_list;
+    assignRValue assignRValue;
+    variable_declaration variable_declaration;
+    type_field type_field;
+    type_fields type_fields;
+    type_inf type_inf;
+    type_declaration type_declaration;
+    function_declaration function_declaration;
+    declaration declaration;
+    declaration_list declaration_list;
 }
 
 %token ARRAY BREAK DO ELSE END FOR FUNCTION IF IN LET NIL OF THEN TO
@@ -40,6 +55,19 @@ tree_node program = NULL;
               stringExp numberExp numberItem numberFrator
 %type <node_list> call_list_opt call_list
 %type <reOp> relationOp
+
+%type <field> field
+%type <field_list> field_list field_list_opt
+%type <assignRValue> assignRValue
+%type <variable_declaration> variable_declaration
+%type <type_field> type_field
+%type <type_fields> type_fields type_fields_opt
+%type <type_inf> type_inf
+%type <type_declaration> type_declaration
+%type <function_declaration> function_declaration
+%type <declaration> declaration
+%type <declaration_list> declaration_list
+
 
 %right ASSIGN
 %nonassoc EQUAL NOT_EQUAL GREATER_THAN GREATER_THAN_OR_EQUAL LESS_THAN LESS_THAN_OR_EQUAL
@@ -90,7 +118,7 @@ whileStm: WHILE relationExp DO stm                  { $$ = whileStm($2, $4); }
 forStm: FOR ID ASSIGN numberExp TO numberExp DO stm { $$ = forStm($2, $4, $6, $8); }
     ;
 
-letStm: LET declaration_list IN stm END             { $$ = letStm(NULL, $4); }
+letStm: LET declaration_list IN stm END             { $$ = letStm($2, $4); }
     ;
 
 functionCallStm: ID LPAREN call_list_opt RPAREN     { $$ = functionCallStm($1, $3); }
@@ -161,57 +189,57 @@ relationOp: EQUAL           { $$ = relationOp_EQUAL(); }
     | LESS_THAN_OR_EQUAL    { $$ = relationOp_LESS_THAN_OR_EQUAL(); }
     ;
 
-declaration_list: declaration
-    | declaration_list declaration
+declaration_list: declaration           { $$ = make_declaration_list($1, NULL); }
+    | declaration_list declaration      { $$ = make_declaration_list($2, $1); }
     ;
 
-declaration: type_declaration
-    | variable_declaration
-    | function_declaration
+declaration: type_declaration       { $$ = make_declaration_type($1);}
+    | variable_declaration          { $$ = make_declaration_variable($1); }
+    | function_declaration          { $$ = make_declaration_function($1); }
     ;
 
-type_declaration: TYPE ID EQUAL type
+type_declaration: TYPE ID EQUAL type_inf       { $$ = make_type_declaration($2, $4); }
     ;
 
-type: ID                                           
-    | LBRACE type_fields_opt RBRACE
-    | ARRAY OF ID
+type_inf: ID                             { $$ = make_type_id($1); }              
+    | LBRACE type_fields_opt RBRACE  { $$ = make_type_struct($2); }
+    | ARRAY OF ID                    { $$ = make_type_array($3); }
     ;
 
-type_fields_opt: type_fields
-    |
+type_fields_opt: type_fields        { $$ = $1; }
+    |                               { $$ = NULL; }
     ;
 
-type_fields: type_field
-    | type_fields COMMA type_field
+type_fields: type_field             { $$ = make_type_fields($1, NULL); }
+    | type_fields COMMA type_field  { $$ = make_type_fields($3, $1); }
     ;
 
-type_field: ID COLON ID
+type_field: ID COLON ID                         { $$ = make_type_field($1, $3); }
     ;
 
-variable_declaration: VAR ID ASSIGN assignRValue
-    | VAR ID COLON ID ASSIGN assignRValue
-    | VAR ID COLON ID ASSIGN NIL
+variable_declaration: VAR ID ASSIGN assignRValue { $$ = make_variable_declaration($2, NULL,$4); }
+    | VAR ID COLON ID ASSIGN assignRValue       { $$ = make_variable_declaration($2, $4, $6); }
+    | VAR ID COLON ID ASSIGN NIL                { $$ = make_variable_declaration($2, $4, make_nil()); }
     ;
 
-assignRValue: algorithmExp
-    | ID LBRACKET numberExp RBRACKET OF numberExp
-    | ID LBRACE field_list_opt RBRACE
+assignRValue: algorithmExp          { $$ = make_algorithmExp($1); }
+    | ID LBRACKET numberExp RBRACKET OF assignRValue { $$ = make_arrayExp($1, $3, $6); }
+    | ID LBRACE field_list_opt RBRACE { $$ = make_fieldList($1, $3); }
     ;
 
-field_list_opt: field_list
-    |
+field_list_opt: field_list      { $$ = $1; }
+    |                           { $$ = NULL; }
     ;
 
-field_list: field
-    | field_list COMMA field
+field_list: field               { $$ = make_field_list($1, NULL); }
+    | field_list COMMA field    { $$ = make_field_list($3, $1); }
     ;
 
-field: ID EQUAL algorithmExp
+field: ID EQUAL assignRValue { $$ = make_field($1, $3); }
     ;
 
-function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN EQUAL stm
-    | FUNCTION ID LPAREN type_fields_opt RPAREN COLON ID EQUAL stm
+function_declaration: FUNCTION ID LPAREN type_fields_opt RPAREN EQUAL stm { $$ = make_function_declaration($2, $4, NULL, $7); }
+    | FUNCTION ID LPAREN type_fields_opt RPAREN COLON ID EQUAL stm          { $$ = make_function_declaration($2, $4, $7, $9); }
     ;
 
 %%
@@ -224,7 +252,18 @@ int yywrap(){
     charPos=1;
     return 1;
 }
-int main()
-{
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s filename\n", argv[0]);
+        return 1;
+    }
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        perror("fopen");
+        return 1;
+    }
+    yyin = file;
     yyparse();
+    fclose(file);
+    return 0;
 }

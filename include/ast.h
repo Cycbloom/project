@@ -2,6 +2,9 @@
 #include "util.h"
 #include <stdio.h>
 
+typedef struct DeclarationList *declaration_list;
+
+
 typedef struct tree_node_ *tree_node;
 typedef struct tree_node_list_ *tree_node_list;
 
@@ -21,9 +24,10 @@ enum relop { EQ, NE, LT, GT, LE, GE, ULT, ULE, UGT, UGE};
 
 struct tree_node_
 {
-    enum { CONST, NAME, TEMP, BINOP, MEM, CALL, ESEQ, MOVE, EXP, JUMP, CJUMP, SEQ, LABLE} kind;
+    enum { CONST,CONSTSTRING, NAME, TEMP, BINOP, MEM, CALL, ESEQ, MOVE, EXP, JUMP, CJUMP, SEQ, LABLE, LET_STM} kind;
     union {
         int consti;
+        string cstring;
         string name;
         tree_node temp;
         struct {enum BINOP op; tree_node left, right;} binop;
@@ -36,6 +40,7 @@ struct tree_node_
         struct {enum relop op; tree_node left, right; tree_node t, f;} cjump;
         struct {tree_node left, right;} seq;
         string lable;
+        struct {declaration_list l; tree_node s;} let_stm;
     } u;
 };
 
@@ -46,6 +51,7 @@ struct tree_node_list_
 };
 
 tree_node Const(int i);
+tree_node ConstString(string s);
 tree_node Name(string n);
 tree_node Temp(tree_node t);
 tree_node Binop(enum BINOP op, tree_node l, tree_node r);
@@ -58,6 +64,7 @@ tree_node Jump(tree_node j);
 tree_node Cjump(enum relop op, tree_node l, tree_node r, tree_node t, tree_node f);
 tree_node Seq(tree_node l, tree_node r);
 tree_node Lable(string l);
+tree_node Let_stm(declaration_list l, tree_node s);
 
 void generateDotFile(tree_node root, const char *filename);
 void print_tree_node(FILE *file, tree_node t);
@@ -123,4 +130,6 @@ tree_node_list call_list_first(tree_node t);
 tree_node_list call_list(tree_node_list l, tree_node t);
 tree_node_list call_list_opt(tree_node_list l);
 tree_node functionCallStm(string id, tree_node_list l);
-tree_node letStm(tree_node_list l, tree_node s);
+tree_node letStm(declaration_list l, tree_node s);
+
+void print_declaration_list(FILE *file, declaration_list dl,declaration_list root);//in declaration.h

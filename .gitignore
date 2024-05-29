@@ -5,3 +5,5 @@ build/y.tab.h
 build/y.tab.c
 tree.dot
 tree.png
+dec.png
+declaration.dot

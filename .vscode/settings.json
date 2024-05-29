@@ -4,6 +4,9 @@
         "compare": "c",
         "limits": "c",
         "new": "c",
-        "ast.h": "c"
+        "ast.h": "c",
+        "string.h": "c",
+        "declaration.h": "c",
+        "type_traits": "c"
     }
 }

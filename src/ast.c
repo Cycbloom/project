@@ -32,6 +32,14 @@ tree_node Const(int i)
     return t;
 }
 
+tree_node ConstString(string s)
+{
+    tree_node t = checked_malloc(sizeof(*t));
+    t->kind = CONSTSTRING;
+    t->u.cstring = s;
+    return t;
+}
+
 tree_node Name(string n)
 {
     tree_node t = checked_malloc(sizeof(*t));
@@ -138,6 +146,15 @@ tree_node Lable(string l)
     return t;
 }
 
+tree_node Let_stm(declaration_list l, tree_node s)
+{
+    tree_node t = checked_malloc(sizeof(*t));
+    t->kind = LET_STM;
+    t->u.let_stm.l = l;
+    t->u.let_stm.s = s;
+    return t;
+}
+
 void generateDotFile(tree_node root, const char *filename) {
     FILE *file = fopen(filename, "w");
     if (file == NULL) {
@@ -163,6 +180,9 @@ void print_tree_node(FILE *file, tree_node node){
     switch (node->kind) {
         case CONST:
             fprintf(file, "node%p [label=\"CONST %d\"];\n", node, node->u.consti);
+            break;
+        case CONSTSTRING:
+            fprintf(file, "node%p [label=\"CONST_STR %s\"];\n", node, node->u.cstring);
             break;
         case NAME:
             fprintf(file, "node%p [label=\"NAME %s\"];\n", node, node->u.name);
@@ -199,6 +219,9 @@ void print_tree_node(FILE *file, tree_node node){
             break;
         case LABLE:
             fprintf(file, "node%p [label=\"LABLE %s\"];\n", node, node->u.lable);
+            break;
+        case LET_STM:
+            fprintf(file, "node%p [label=\"LET_STM\"];\n", node);
             break;
         default:
             fprintf(file, "node%p [label=\"UNKNOWN\"];\n", node);
@@ -253,7 +276,14 @@ void print_tree_node(FILE *file, tree_node node){
         print_tree_node(file, node->u.seq.right);
         fprintf(file, "node%p -> node%p [label=\"left\"];\n", node, node->u.seq.left);
         fprintf(file, "node%p -> node%p [label=\"right\"];\n", node, node->u.seq.right);
+    } else if(node->kind == LET_STM) {
+        fprintf(file, "node%p [label = \"declaration list\"];\n", node->u.let_stm.l);
+        print_declaration_list(file, node->u.let_stm.l, node->u.let_stm.l);
+        print_tree_node(file, node->u.let_stm.s);
+        fprintf(file, "node%p -> node%p [label=\"declaration\"];\n", node, node->u.let_stm.l);
+        fprintf(file, "node%p -> node%p [label=\"statement\"];\n", node, node->u.let_stm.s);
     }
+
 }
 
 const char* binop_to_string(enum BINOP op) {
@@ -428,7 +458,7 @@ stringExp: STRING_CONSTANT  { $$ = stringExp_STRING_CONSTANT($1); }
 
 tree_node stringExp_STRING_CONSTANT(string s)
 {
-    return Name(s);
+    return ConstString(s);
 }
 
 /*
@@ -598,7 +628,7 @@ tree_node forStm(string id, tree_node l, tree_node r, tree_node s)
     tree_node begin_body = Lable("begin_body");
     tree_node end_label = Lable("end");
     tree_node temp = Move(Name(id), l);
-    temp = Seq(temp, Seq(begin_label, r));
+    temp = Seq(temp, begin_label);
     temp = Seq(temp, Cjump(LE, Name(id), r, begin_body, end_label));
     temp = Seq(temp, begin_body);
     temp = Seq(temp, s);
@@ -845,11 +875,10 @@ letStm: LET declaration_list IN stm END             { $$ = letStm($2, $4); }
     ;
 */
 
-tree_node letStm(tree_node_list l, tree_node s)
+tree_node letStm(declaration_list l, tree_node s)
 {
-    return s;
+    return Let_stm(l, s);
 }
-
 
 
 

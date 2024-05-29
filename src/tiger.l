@@ -1,5 +1,6 @@
 %{
 #include"ast.h"
+#include"declaration.h"
 #include <stdio.h>
 #include"y.tab.h"
 #include"errormsg.h"
@@ -73,7 +74,7 @@ void adjust(void)
 \"([^\\\"]|\\.)*\" { adjust();
                      char* temp = strdup(yytext);
                      temp[strlen(temp)-1] = '\0'; // 去除双引号
-                     yylval.sval = temp;
+                     yylval.sval = temp+1;
                      return STRING_CONSTANT; 
                     }
 \n                 { adjust();/* 忽略换行符 */ }

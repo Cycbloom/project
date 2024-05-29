@@ -11,13 +11,11 @@ BUILDDIR = build
 # Files
 YACCFILE = tiger.y
 LEXFILE = tiger.l
-ASTFILE = ast.c
-UTILFILE = util.c
 
 # Targets
 all: $(BUILDDIR)/tiger
 
-$(BUILDDIR)/tiger: $(BUILDDIR)/y.tab.c $(BUILDDIR)/lex.yy.c $(SRCDIR)/$(ASTFILE) $(SRCDIR)/$(UTILFILE)
+$(BUILDDIR)/tiger: $(BUILDDIR)/y.tab.c $(BUILDDIR)/lex.yy.c $(SRCDIR)/*.c
 	$(CC) $(CFLAGS) -o $@ -Iinclude $^
 
 $(BUILDDIR)/y.tab.c: $(SRCDIR)/$(YACCFILE)
