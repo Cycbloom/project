@@ -1,0 +1,2 @@
+for a:=2 to 5 
+do print(a)

@@ -132,7 +132,7 @@ call_list: call_paramater               { $$ = call_list_first($1); }
     | call_list COMMA call_paramater    { $$ = call_list($1, $3); }
     ;
 
-call_paramater: algorithmExp        { $$ = call_paramater_algorithmExp($1); }
+call_paramater: relationItemLeft        { $$ = call_paramater_algorithmExp($1); }
     | functionCallStm               { $$ = call_paramater_functionCallStm($1); }
     ;
 

@@ -1,0 +1,6 @@
+let 
+var N:=8
+function fact(n:int,y:int)=
+( if n=0 then print("\n"))
+in fact(n)
+end

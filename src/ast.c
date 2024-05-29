@@ -278,10 +278,14 @@ void print_tree_node(FILE *file, tree_node node){
         fprintf(file, "node%p -> node%p [label=\"right\"];\n", node, node->u.seq.right);
     } else if(node->kind == LET_STM) {
         fprintf(file, "node%p [label = \"declaration list\"];\n", node->u.let_stm.l);
-        print_declaration_list(file, node->u.let_stm.l, node->u.let_stm.l);
-        print_tree_node(file, node->u.let_stm.s);
-        fprintf(file, "node%p -> node%p [label=\"declaration\"];\n", node, node->u.let_stm.l);
-        fprintf(file, "node%p -> node%p [label=\"statement\"];\n", node, node->u.let_stm.s);
+        if(node->u.let_stm.l != NULL){
+            print_declaration_list(file, node->u.let_stm.l, node->u.let_stm.l);
+            fprintf(file, "node%p -> node%p [label=\"declaration\"];\n", node, node->u.let_stm.l);
+        }
+        if (node->u.let_stm.s != NULL){
+            print_tree_node(file, node->u.let_stm.s);
+            fprintf(file, "node%p -> node%p [label=\"statement\"];\n", node, node->u.let_stm.s);
+        }
     }
 
 }

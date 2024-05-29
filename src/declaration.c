@@ -324,10 +324,11 @@ void print_type_fields(FILE *file, type_fields tf){
         return;
     }
     type_field t = tf->field;
-    fprintf(file, "node%p [label = \"type field: %s\"];\n", t, t->id);
-    fprintf(file, "node%p [label = \"type: %s\"];\n", t, t->type);
-    print_type_fields(file, tf->next);
-    fprintf(file, "node%p -> node%p [lable = \"next\"];\n", tf, tf->next);
+    fprintf(file, "node%p [label = \"type_name: %s, type:%s\"];\n", tf, t->id,t->type);
+    if(tf->next){
+        print_type_fields(file, tf->next);
+        fprintf(file, "node%p -> node%p [lable = \"next\"];\n", tf, tf->next);
+    }
 }
 
 void print_assignRValue(FILE *file, assignRValue arv){
