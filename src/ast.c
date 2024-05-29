@@ -849,7 +849,31 @@ tree_node letStm(tree_node_list l, tree_node s)
 {
     return s;
 }
+tree_node declaration_list_first(tree_node t)
+{
+    return Tree_node_list(t, NULL);
+}
 
+tree_node declaration_list(tree_node_list l, tree_node t)
+{
+    return Tree_node_list(t, l);
+}
+
+
+tree_node declaration_type_declaration(tree_node t)
+{
+    return t;
+}
+
+tree_node declaration_variable_declaration(tree_node t)
+{
+    return t;
+}
+
+tree_node declaration_function_declaration(tree_node t)
+{
+    return t;
+}
 
 
 
