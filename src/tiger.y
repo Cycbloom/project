@@ -52,7 +52,7 @@ tree_node program = NULL;
 %type <node>  stmBlock_opt stmBlock stm assignStm conditionStm whileStm
               forStm letStm functionCallStm call_paramater lvalue relationExp
               relationExpOR relationExpAND relationExpItem algorithmExp 
-              stringExp numberExp numberItem numberFrator
+              stringExp numberExp numberItem numberFrator relationItemLeft relationItemRight
 %type <node_list> call_list_opt call_list
 %type <reOp> relationOp
 
@@ -152,10 +152,19 @@ relationExpAND: relationExpItem                 { $$ = relationExpAND_relationEx
     | relationExpAND AND relationExpItem        { $$ = relationExpAND_AND($1, $3); }
     ;
 
-relationExpItem: algorithmExp relationOp algorithmExp   { $$ = relationExpItem_algorithmExp_relationOp_algorithmExp($1, $2, $3); }
+relationItemLeft: lvalue DOT ID                     { $$ = lvalue_DOT($1, $3); }
+    | lvalue LBRACKET numberExp RBRACKET            { $$ = lvalue_LBRACKET($1, $3);}
+    | algorithmExp                                  { $$ = $1;}
+    ;
+
+relationItemRight: lvalue DOT ID                     { $$ = lvalue_DOT($1, $3); }
+    | lvalue LBRACKET numberExp RBRACKET            { $$ = lvalue_LBRACKET($1, $3);}
+    | algorithmExp                                  { $$ = $1;}
+    | NIL                                           { $$ = Lable("nil");}
+    ;
+
+relationExpItem: relationItemLeft relationOp relationItemRight  { $$ = relationExpItem_algorithmExp_relationOp_algorithmExp($1, $2, $3); }
     | algorithmExp                                      { $$ = relationExpItem_algorithmExp($1); }
-    | algorithmExp NOT_EQUAL NIL                        { $$ = relationExpItem_algorithmExp_NOT_EQUAL_NIL($1); }
-    | algorithmExp EQUAL NIL                            { $$ = relationExpItem_algorithmExp_EQUAL_NIL($1); }
     ;
 
 algorithmExp: numberExp     { $$ = algorithmExp_numberExp($1); }                   
